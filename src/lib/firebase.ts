@@ -1,7 +1,10 @@
-// src/lib/firebase.ts
-import { initializeApp, getApps } from "firebase/app";
-import { getDatabase } from "firebase/database";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getDatabase } from 'firebase/database';
 
+// --- FIREBASE SETUP ---
+// Replace the placeholder values below with your actual Firebase project credentials.
+// You can find these in your Firebase project settings.
 const firebaseConfig = {
   apiKey: "AIzaSyBqh0tIr4nmKB4KqHFKFcoX0lIPOqOKGxA",
   authDomain: "cp-store-85060.firebaseapp.com",
@@ -9,12 +12,16 @@ const firebaseConfig = {
   projectId: "cp-store-85060",
   storageBucket: "cp-store-85060.appspot.com",
   messagingSenderId: "779192570738",
-  appId: "1:779192570738:web:7692c029d667c173b1c3eb",
-  measurementId: "G-8XB2SD2WZL"
+  appId: "1:779192570738:web:7692c029d667c173b1c3eb"
 };
 
-// pastikan app hanya di-init sekali
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+declare const __app_id: string;
 
-// 👉 inilah yang harus diexport
+// This variable is provided by the environment, no need to change it.
+export const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+// Initialize Firebase and export instances
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+// Export the Realtime Database instance
 export const db = getDatabase(app);
