@@ -1,75 +1,132 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from 'react';
+import { signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { ref, onValue } from "firebase/database";
-import { db } from "../lib/firebase";
+import { Product } from '../lib/data';
+import { appId } from '../lib/firebase';
+import SearchInput from '../component/search';
+// import CategoryFilter from '../component/category_filter';
+import ProductTable from '../component/product_table';
+import { auth, db } from '../lib/firebase';
+declare const __initial_auth_token: string | undefined;
 
-// Definisikan interface sesuai data di Firebase
-interface Product {
-  biaya_prototype: string;
-  foto: string;
-  harga: string;
-  kode: string;
-  link: string;
-  nama: string;
-  nim: string;
-  no_hp: string;
-  produk: string;
-}
 
-export default function HomePage() {
-  const [products, setProducts] = useState<Record<string, Product> | null>(null);
+// --- MAIN DASHBOARD PAGE ---
+
+export default function ProductDashboard() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortKey, setSortKey] = useState<keyof Product>('nama');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
-    // Data kamu ada langsung di root "/"
-    const productsRef = ref(db, "/");
-    const unsubscribe = onValue(productsRef, (snapshot) => {
-      if (snapshot.exists()) {
-        setProducts(snapshot.val());
+    const signIn = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (error) {
+        console.error("Error signing in:", error);
+      }
+    };
+    signIn();
+
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const productsRef = ref(db, `/artifacts/${appId}/public/data/products`);
+        
+        const unsubscribeSnapshot = onValue(productsRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            const productsData = Object.keys(data).map(key => ({
+              id: key,
+              ...data[key]
+            })) as Product[];
+            setProducts(productsData);
+          } else {
+            setProducts([]);
+          }
+        }, (error) => {
+          console.error("Error fetching products:", error);
+        });
+
+        return () => unsubscribeSnapshot();
       } else {
-        setProducts({});
+        setProducts([]);
       }
     });
 
-    return () => unsubscribe();
+    return () => unsubscribeAuth();
   }, []);
 
-  return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Daftar Produk</h2>
+  // const handleCategoryChange = (category: string) => {
+  //   setSelectedCategories(prev =>
+  //     prev.includes(category)
+  //       ? prev.filter(c => c !== category)
+  //       : [...prev, category]
+  //   );
+  // };
 
-      {!products ? (
-        <p>Loading...</p>
-      ) : Object.keys(products).length === 0 ? (
-        <p>Tidak ada produk</p>
-      ) : (
-        <div className="space-y-4">
-          {Object.entries(products).map(([id, product]) => (
-            <div
-              key={id}
-              className="p-4 bg-white rounded-xl shadow-md border border-gray-200"
-            >
-              <h3 className="font-bold text-lg">{product.produk}</h3>
-              <p className="text-gray-600">Harga: Rp {parseInt(product.harga).toLocaleString("id-ID")}</p>
-              <p>Biaya Prototype: Rp {parseInt(product.biaya_prototype).toLocaleString("id-ID")}</p>
-              <p>Kode: {product.kode}</p>
-              <p>Nama: {product.nama}</p>
-              <p>NIM: {product.nim}</p>
-              <p>No HP: {product.no_hp}</p>
-              {product.link && (
-                <a
-                  href={product.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-500 underline"
-                >
-                  Link Produk
-                </a>
-              )}
-            </div>
-          ))}
+  const handleSort = (key: keyof Product) => {
+    if (key === sortKey) {
+      setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortOrder('asc');
+    }
+  };
+
+  const filteredAndSortedProducts = useMemo(() => {
+    const result = products
+      // .filter(product => selectedCategories.length === 0 || selectedCategories.includes(product.category))
+      .filter(product => product.nama.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    result.sort((a, b) => {
+      const valA = a[sortKey];
+      const valB = b[sortKey];
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return result;
+  }, [products, searchTerm, sortKey, sortOrder]);
+
+  return (
+    <div className="min-h-screen bg-gray-100 font-sans p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-800">Product Dashboard</h1>
+          <p className="text-lg text-gray-600 mt-1">Manage and view your product inventory.</p>
+        </header>
+
+        <div className="bg-white rounded-lg shadow p-6 mb-8 space-y-6">
+          <SearchInput
+            value={searchTerm}
+            onChange={setSearchTerm}
+            onClear={() => setSearchTerm('')}
+          />
+          {/* <CategoryFilter
+            selectedCategories={selectedCategories}
+            onCategoryChange={handleCategoryChange}
+          /> */}
         </div>
-      )}
+
+        <ProductTable
+          products={filteredAndSortedProducts}
+          sortKey={sortKey}
+          sortOrder={sortOrder}
+          onSort={handleSort}
+        />
+        
+        <footer className="text-center mt-8 text-gray-500 text-sm">
+          <p>Showing {filteredAndSortedProducts.length} of {products.length} products.</p>
+        </footer>
+      </div>
     </div>
   );
 }
+
