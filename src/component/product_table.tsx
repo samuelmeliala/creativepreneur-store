@@ -55,7 +55,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
           {products.length > 0 ? (
             products.map((product) => (
               <tr key={product.kode} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.nama}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.produk}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
                     product.category === 'Food & Beverage' ? 'bg-blue-100 text-blue-800' :
@@ -69,9 +69,16 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
                     {product.category}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${product.harga.toFixed(2)}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.produk}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.biaya_prototype.toFixed(2)} ⭐</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.harga}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.nama}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.biaya_prototype}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.nim}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.no_hp}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.medsos}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.kode}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <img src={product.foto} alt={product.produk} className="h-10 w-10 object-cover rounded" />
+                </td>
               </tr>
             ))
           ) : (
