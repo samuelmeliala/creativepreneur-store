@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import  { Product }  from "../lib/data";
+import { Product } from "../lib/data";
 
 type ProductTableProps = {
   products: Product[];
@@ -14,8 +14,8 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
     if (sortKey !== key) {
       return <ChevronDown className="h-4 w-4 text-gray-400" />;
     }
-    return sortOrder === 'asc' 
-      ? <ChevronUp className="h-4 w-4 text-gray-800" /> 
+    return sortOrder === 'asc'
+      ? <ChevronUp className="h-4 w-4 text-gray-800" />
       : <ChevronDown className="h-4 w-4 text-gray-800" />;
   };
 
@@ -32,14 +32,21 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
     { key: 'foto', label: 'Foto Produk' },
   ];
 
+  // Kelompokkan produk berdasarkan kode
+  const grouped = products.reduce((acc, product) => {
+    if (!acc[product.kode]) acc[product.kode] = [];
+    acc[product.kode].push(product);
+    return acc;
+  }, {} as Record<string, Product[]>);
+
   return (
     <div className="overflow-x-auto bg-white rounded-lg shadow">
       <table className="w-full text-left">
         <thead className="bg-gray-50 border-b border-gray-200">
           <tr>
             {headers.map(header => (
-              <th 
-                key={header.key} 
+              <th
+                key={header.key}
                 className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase tracking-wider cursor-pointer select-none"
                 onClick={() => onSort(header.key)}
               >
@@ -53,37 +60,80 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
         </thead>
         <tbody className="divide-y divide-gray-200">
           {products.length > 0 ? (
-            products.map((product) => (
-              <tr key={product.kode} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.produk}</td>
+            Object.entries(grouped).map(([kode, items]) => (
+              <tr key={kode} className="hover:bg-gray-50 transition-colors">
+                {/* Nama Mahasiswa (join ke bawah) */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {items.map((p, idx) => (
+                    <div key={idx}>{p.nama}</div>
+                  ))}
+                </td>
+
+                {/* Kategori (ambil dari produk pertama) */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    product.category === 'Food & Beverage' ? 'bg-blue-100 text-blue-800' :
-                    product.category === 'Fashion' ? 'bg-green-100 text-green-800' :
-                    product.category === 'Technology' ? 'bg-purple-100 text-purple-800' :
-                    product.category === 'Services' ? 'bg-red-100 text-red-800' :
-                    product.category === 'Health & Beauty' ? 'bg-pink-100 text-pink-800' :
-                    product.category === 'Education' ? 'bg-indigo-100 text-indigo-800' :
+                    items[0].category === 'Food & Beverage' ? 'bg-blue-100 text-blue-800' :
+                    items[0].category === 'Fashion' ? 'bg-green-100 text-green-800' :
+                    items[0].category === 'Technology' ? 'bg-purple-100 text-purple-800' :
+                    items[0].category === 'Services' ? 'bg-red-100 text-red-800' :
+                    items[0].category === 'Health & Beauty' ? 'bg-pink-100 text-pink-800' :
+                    items[0].category === 'Education' ? 'bg-indigo-100 text-indigo-800' :
                     'bg-yellow-100 text-yellow-800'
                   }`}>
-                    {product.category}
+                    {items[0].category}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.harga}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.nama}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.biaya_prototype}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.nim}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.no_hp}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.medsos}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.kode}</td>
+
+                {/* Harga Produk (ambil satu, bukan join) */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <img src={product.foto} alt={product.produk} className="h-10 w-10 object-cover rounded" />
+                  {items[0].harga}
+                </td>
+
+                {/* Nama Produk (ambil satu, bukan join) */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {items[0].produk}
+                </td>
+
+                {/* Biaya Prototype (ambil satu, bukan join) */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {items[0].biaya_prototype}
+                </td>
+
+                {/* NIM (join ke bawah) */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {items.map((p, idx) => (
+                    <div key={idx}>{p.nim}</div>
+                  ))}
+                </td>
+
+                {/* No HP (join ke bawah) */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {items.map((p, idx) => (
+                    <div key={idx}>{p.no_hp}</div>
+                  ))}
+                </td>
+
+                {/* Media Sosial */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {items.map((p, idx) => (
+                    <div key={idx}>{p.medsos}</div>
+                  ))}
+                </td>
+
+                {/* Kode Produk */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {kode}
+                </td>
+
+                {/* Foto Produk */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {/* <img src={items[0].foto} alt={items[0].produk} className="h-10 w-10 object-cover rounded" /> */}
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={5} className="text-center py-10 text-gray-500">
+              <td colSpan={10} className="text-center py-10 text-gray-500">
                 No products found. Try adjusting your filters.
               </td>
             </tr>
@@ -95,4 +145,3 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
 };
 
 export default ProductTable;
-
