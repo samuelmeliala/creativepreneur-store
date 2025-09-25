@@ -27,7 +27,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
     { key: 'biaya_prototype', label: 'Biaya Prototype' },
     { key: 'nim', label: 'NIM' },
     { key: 'no_hp', label: 'No HP' },
-    { key: 'medsos', label: 'Media Sosial' },
+    { key: 'link', label: 'Media Sosial' },
     { key: 'kode', label: 'Kode Produk' },
     { key: 'foto', label: 'Foto Produk' },
   ];
@@ -114,11 +114,24 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
                 </td>
 
                 {/* Media Sosial */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
                   {items.map((p, idx) => (
-                    <div key={idx}>{p.medsos}</div>
-                  ))}
-                </td>
+                    <div key={idx}>
+                      {p.link ? (
+                        <a
+                        href={p.link.startsWith("http") ? p.link : `https://${p.link}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                        >
+                          {p.link}
+                          </a>
+                          ) : (
+                            "-"
+                            )}
+                            </div>
+                          ))}
+                          </td>
 
                 {/* Kode Produk */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
