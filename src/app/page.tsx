@@ -8,13 +8,11 @@ import { Product } from '../lib/data';
 import ProductTable from '../component/product_table';
 
 export default function ProductDashboard() {
-  // The products state is initialized as an empty array.
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortKey, setSortKey] = useState<keyof Product>('produk');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // NOTE: All useEffect code for connecting to and fetching from Firebase has been removed.
   useEffect(() => {
     const productsRef = ref(db, "/");
     const unsubscribe = onValue(productsRef, (snapshot) => {
