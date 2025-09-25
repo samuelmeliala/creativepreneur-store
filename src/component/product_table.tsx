@@ -114,8 +114,9 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
                 </td>
 
                 {/* Media Sosial */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
                   {items.map((p, idx) => (
+<<<<<<< HEAD
                     p.link ? (
                       <div key={idx}>
                         <a href={p.link} target="_blank" rel="noopener noreferrer" className="inline-block">
@@ -131,6 +132,24 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
                     )
                   ))}
                 </td>
+=======
+                    <div key={idx}>
+                      {p.link ? (
+                        <a
+                        href={p.link.startsWith("http") ? p.link : `https://${p.link}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                        >
+                          {p.link}
+                          </a>
+                          ) : (
+                            "-"
+                            )}
+                            </div>
+                          ))}
+                          </td>
+>>>>>>> 367bd1770e3ffd3199c004e702e74fd40f822c11
 
                 {/* Kode Produk */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

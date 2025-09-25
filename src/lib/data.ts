@@ -3,7 +3,7 @@ export type Product = {
   foto: string;
   harga: number;
   kode: string;
-  link: string;
+  medsos: string;
   nama: string;
   nim: number;
   no_hp: number;
