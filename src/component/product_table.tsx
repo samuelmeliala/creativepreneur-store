@@ -20,14 +20,14 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
   };
 
   const headers: { key: keyof Product; label: string }[] = [
+    { key: 'produk', label: 'Nama Produk' },
     { key: 'nama', label: 'Nama Mahasiswa' },
     { key: 'category', label: 'Kategori' },
     { key: 'harga', label: 'Harga Produk' },
-    { key: 'produk', label: 'Nama Produk' },
     { key: 'biaya_prototype', label: 'Biaya Prototype' },
     { key: 'nim', label: 'NIM' },
     { key: 'no_hp', label: 'No HP' },
-    { key: 'medsos', label: 'Media Sosial' },
+    { key: 'link', label: 'Media Sosial' },
     { key: 'kode', label: 'Kode Produk' },
     { key: 'foto', label: 'Foto Produk' },
   ];
@@ -62,8 +62,13 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
           {products.length > 0 ? (
             Object.entries(grouped).map(([kode, items]) => (
               <tr key={kode} className="hover:bg-gray-50 transition-colors">
-                {/* Nama Mahasiswa (join ke bawah) */}
+                {/* Nama Produk (ambil satu, bukan join) */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  {items[0].produk}
+                </td>
+
+                {/* Nama Mahasiswa (join ke bawah) */}
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {items.map((p, idx) => (
                     <div key={idx}>{p.nama}</div>
                   ))}
@@ -89,11 +94,6 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
                   {items[0].harga}
                 </td>
 
-                {/* Nama Produk (ambil satu, bukan join) */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {items[0].produk}
-                </td>
-
                 {/* Biaya Prototype (ambil satu, bukan join) */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {items[0].biaya_prototype}
@@ -116,7 +116,19 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
                 {/* Media Sosial */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {items.map((p, idx) => (
-                    <div key={idx}>{p.medsos}</div>
+                    p.link ? (
+                      <div key={idx}>
+                        <a href={p.link} target="_blank" rel="noopener noreferrer" className="inline-block">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-instagram text-pink-500">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                            <line x1="17.5" y1="6.5" x2="17.5" y2="6.5" />
+                          </svg>
+                        </a>
+                      </div>
+                    ) : (
+                      <div key={idx}>-</div>
+                    )
                   ))}
                 </td>
 
