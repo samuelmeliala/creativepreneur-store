@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Product } from "../lib/data";
+import { Button } from "../component/ui/button";
 
 type ProductTableProps = {
   products: Product[];
@@ -10,6 +11,8 @@ type ProductTableProps = {
 };
 
 const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrder, onSort }) => {
+  const [selected, setSelected] = useState<Product | null>(null);
+
   const renderSortIcon = (key: keyof Product) => {
     if (sortKey !== key) {
       return <ChevronDown className="h-4 w-4 text-gray-400" />;
@@ -22,17 +25,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
   const headers: { key: keyof Product; label: string }[] = [
     { key: 'produk', label: 'Nama Produk' },
     { key: 'nama', label: 'Nama Mahasiswa' },
-    { key: 'category', label: 'Kategori' },
-    { key: 'harga', label: 'Harga Produk' },
-    { key: 'biaya_prototype', label: 'Biaya Prototype' },
     { key: 'nim', label: 'NIM' },
-    { key: 'no_hp', label: 'No HP' },
-    { key: 'link', label: 'Media Sosial' },
-    { key: 'kode', label: 'Kode Produk' },
-    { key: 'foto', label: 'Foto Produk' },
+    { key: 'harga', label: 'Harga Produk' },
   ];
 
-  // Kelompokkan produk berdasarkan kode
+  // Group by kode produk
   const grouped = products.reduce((acc, product) => {
     if (!acc[product.kode]) acc[product.kode] = [];
     acc[product.kode].push(product);
@@ -56,102 +53,89 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
                 </div>
               </th>
             ))}
+            <th className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase">Detail</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
           {products.length > 0 ? (
             Object.entries(grouped).map(([kode, items]) => (
               <tr key={kode} className="hover:bg-gray-50 transition-colors">
-                {/* Nama Produk (ambil satu, bukan join) */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                {/* Nama Produk */}
+                <td className="px-6 py-4 text-sm font-medium text-gray-900">
                   {items[0].produk}
                 </td>
 
-                {/* Nama Mahasiswa (join ke bawah) */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {/* Nama Mahasiswa */}
+                <td className="px-6 py-4 text-sm text-gray-500">
                   {items.map((p, idx) => (
                     <div key={idx}>{p.nama}</div>
                   ))}
                 </td>
 
-                {/* Kategori (ambil dari produk pertama) */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    items[0].category === 'Food & Beverage' ? 'bg-blue-100 text-blue-800' :
-                    items[0].category === 'Fashion' ? 'bg-green-100 text-green-800' :
-                    items[0].category === 'Technology' ? 'bg-purple-100 text-purple-800' :
-                    items[0].category === 'Services' ? 'bg-red-100 text-red-800' :
-                    items[0].category === 'Health & Beauty' ? 'bg-pink-100 text-pink-800' :
-                    items[0].category === 'Education' ? 'bg-indigo-100 text-indigo-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {items[0].category}
-                  </span>
-                </td>
-
-                {/* Harga Produk (ambil satu, bukan join) */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {items[0].harga}
-                </td>
-
-                {/* Biaya Prototype (ambil satu, bukan join) */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {items[0].biaya_prototype}
-                </td>
-
-                {/* NIM (join ke bawah) */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                {/* NIM */}
+                <td className="px-6 py-4 text-sm text-gray-500">
                   {items.map((p, idx) => (
                     <div key={idx}>{p.nim}</div>
                   ))}
                 </td>
 
-                {/* No HP (join ke bawah) */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {items.map((p, idx) => (
-                    <div key={idx}>{p.no_hp}</div>
-                  ))}
+                {/* Harga Produk */}
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  {items[0].harga}
                 </td>
 
-                {/* Media Sosial */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
-                  {items.map((p, idx) => (
-                    p.link ? (
-                      <div key={idx}>
-                        <a href={p.link} target="_blank" rel="noopener noreferrer" className="inline-block">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-instagram text-pink-500">
-                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                            <line x1="17.5" y1="6.5" x2="17.5" y2="6.5" />
-                          </svg>
-                        </a>
-                      </div>
-                    ) : (
-                      <div key={idx}>-</div>
-                    )
-                  ))}
-                </td>
-
-                {/* Kode Produk */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {kode}
-                </td>
-
-                {/* Foto Produk */}
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {/* <img src={items[0].foto} alt={items[0].produk} className="h-10 w-10 object-cover rounded" /> */}
+                {/* Tombol More Details */}
+                <td className="px-6 py-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelected(items[0])}
+                  >
+                    More Details
+                  </Button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan={10} className="text-center py-10 text-gray-500">
+              <td colSpan={5} className="text-center py-10 text-gray-500">
                 No products found. Try adjusting your filters.
               </td>
             </tr>
           )}
         </tbody>
       </table>
+
+      {/* Modal Detail */}
+      {selected && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white p-6 rounded-lg w-96">
+            <h2 className="text-lg font-bold mb-3">{selected.produk}</h2>
+
+            {/* Foto Produk */}
+            {selected.foto && (
+              <div className="mb-3">
+                <img
+                  src={selected.foto}
+                  alt={selected.produk}
+                  className="w-full h-48 object-cover rounded"
+                />
+              </div>
+            )}
+
+            <p><strong>Kategori:</strong> {selected.category}</p>
+            <p><strong>Biaya Prototype:</strong> {selected.biaya_prototype}</p>
+            <p><strong>No HP:</strong> {selected.no_hp}</p>
+            <p><strong>Media Sosial:</strong> {selected.link}</p>
+            <p><strong>Kode Produk:</strong> {selected.kode}</p>
+
+            <div className="mt-4 flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => setSelected(null)}>
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
