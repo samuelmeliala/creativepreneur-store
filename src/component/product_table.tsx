@@ -23,16 +23,16 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
   };
 
   const headers: { key: keyof Product; label: string }[] = [
-    { key: 'produk', label: 'Nama Produk' },
+    { key: 'nama_produk', label: 'Nama Produk' },
     { key: 'nama', label: 'Nama Mahasiswa' },
     { key: 'nim', label: 'NIM' },
-    { key: 'harga', label: 'Harga Produk' },
+    { key: 'harga_produk', label: 'Harga Produk' },
   ];
 
-  // Group by kode produk
+  // Group by nama_produk (biar 1 produk bisa punya banyak mahasiswa)
   const grouped = products.reduce((acc, product) => {
-    if (!acc[product.kode]) acc[product.kode] = [];
-    acc[product.kode].push(product);
+    if (!acc[product.nama_produk]) acc[product.nama_produk] = [];
+    acc[product.nama_produk].push(product);
     return acc;
   }, {} as Record<string, Product[]>);
 
@@ -58,11 +58,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
         </thead>
         <tbody className="divide-y divide-gray-200">
           {products.length > 0 ? (
-            Object.entries(grouped).map(([kode, items]) => (
-              <tr key={kode} className="hover:bg-gray-50 transition-colors">
+            Object.entries(grouped).map(([namaProduk, items]) => (
+              <tr key={namaProduk} className="hover:bg-gray-50 transition-colors">
                 {/* Nama Produk */}
                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                  {items[0].produk}
+                  {items[0].nama_produk}
                 </td>
 
                 {/* Nama Mahasiswa */}
@@ -81,7 +81,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
 
                 {/* Harga Produk */}
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  {items[0].harga}
+                  {items[0].harga_produk}
                 </td>
 
                 {/* Tombol More Details */}
@@ -109,24 +109,24 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
       {selected && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-lg font-bold mb-3">{selected.produk}</h2>
+            <h2 className="text-lg font-bold mb-3">{selected.nama_produk}</h2>
 
             {/* Foto Produk */}
-            {selected.foto && (
+            {selected.foto_produk && (
               <div className="mb-3">
                 <img
-                  src={selected.foto}
-                  alt={selected.produk}
+                  src={selected.foto_produk}
+                  alt={selected.nama_produk}
                   className="w-full h-48 object-cover rounded"
                 />
               </div>
             )}
 
-            <p><strong>Kategori:</strong> {selected.category}</p>
-            <p><strong>Biaya Prototype:</strong> {selected.biaya_prototype}</p>
-            <p><strong>No HP:</strong> {selected.no_hp}</p>
-            <p><strong>Media Sosial:</strong> {selected.link}</p>
-            <p><strong>Kode Produk:</strong> {selected.kode}</p>
+            <p><strong>Kategori:</strong> {selected.kategori_bisnis}</p>
+            <p><strong>Nama Bisnis:</strong> {selected.nama_bisnis}</p>
+            <p><strong>Tanggal Berdiri:</strong> {selected.tanggal_berdiri}</p>
+            <p><strong>Nomor Telepon:</strong> {selected.no_hp}</p>
+            <p><strong>Tanggal Diserahkan:</strong> {selected.tanggal_diserahkan}</p>
 
             <div className="mt-4 flex justify-end gap-2">
               <Button variant="secondary" onClick={() => setSelected(null)}>

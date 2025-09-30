@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from "react";
 import { ref, onValue } from "firebase/database";
-import { db } from '../lib/firebase';
-import SearchInput from '../component/search';
-import { Product } from '../lib/data';
-import ProductTable from '../component/product_table';
+import { db } from "../lib/firebase";
+import SearchInput from "../component/search";
+import { Product } from "../lib/data";
+import ProductTable from "../component/product_table";
 
 export default function ProductDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortKey, setSortKey] = useState<keyof Product>('produk');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortKey, setSortKey] = useState<keyof Product>("nama_produk");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
     const productsRef = ref(db, "/");
@@ -31,29 +31,32 @@ export default function ProductDashboard() {
 
   const handleSort = (key: keyof Product) => {
     if (key === sortKey) {
-      setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
+      setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
     } else {
       setSortKey(key);
-      setSortOrder('asc');
+      setSortOrder("asc");
     }
   };
 
   const filteredAndSortedProducts = useMemo(() => {
     if (!Array.isArray(products)) return [];
 
-  const result = products
-      .filter(product => product.produk.toLowerCase().includes(searchTerm.toLowerCase()));
+    const result = products.filter((product) =>
+      (product.nama_produk || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
 
     result.sort((a, b) => {
       const valA = a[sortKey];
       const valB = b[sortKey];
-      
-      if (typeof valA === 'number' && typeof valB === 'number') {
-        return sortOrder === 'asc' ? valA - valB : valB - valA;
+
+      if (typeof valA === "number" && typeof valB === "number") {
+        return sortOrder === "asc" ? valA - valB : valB - valA;
       }
-      
-      if (String(valA) < String(valB)) return sortOrder === 'asc' ? -1 : 1;
-      if (String(valA) > String(valB)) return sortOrder === 'asc' ? 1 : -1;
+
+      if (String(valA) < String(valB)) return sortOrder === "asc" ? -1 : 1;
+      if (String(valA) > String(valB)) return sortOrder === "asc" ? 1 : -1;
       return 0;
     });
 
@@ -65,14 +68,16 @@ export default function ProductDashboard() {
       <div className="max-w-full mx-auto">
         <header className="mb-8">
           <h1 className="text-4xl font-bold text-gray-800">Product Dashboard</h1>
-          <p className="text-lg text-gray-600 mt-1">Manage and view your product inventory.</p>
+          <p className="text-lg text-gray-600 mt-1">
+            Manage and view your product inventory.
+          </p>
         </header>
 
         <div className="bg-white rounded-lg shadow p-6 mb-8 space-y-6">
           <SearchInput
             value={searchTerm}
             onChange={setSearchTerm}
-            onClear={() => setSearchTerm('')}
+            onClear={() => setSearchTerm("")}
           />
         </div>
 
@@ -82,12 +87,14 @@ export default function ProductDashboard() {
           sortOrder={sortOrder}
           onSort={handleSort}
         />
-        
+
         <footer className="text-center mt-8 text-gray-500 text-sm">
-          <p>Showing {filteredAndSortedProducts.length} of {products.length} products.</p>
+          <p>
+            Showing {filteredAndSortedProducts.length} of {products.length}{" "}
+            products.
+          </p>
         </footer>
       </div>
     </div>
   );
 }
-
