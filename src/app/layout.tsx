@@ -19,7 +19,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <nav className="bg-gray-800 text-white p-4">
           {/* Your main navigation would go here */}
-          <p>My App</p>
+          <p>CP Store Dashboard</p>
         </nav>
         <main>
           {/* The 'children' prop is where your page.tsx content will be rendered */}
