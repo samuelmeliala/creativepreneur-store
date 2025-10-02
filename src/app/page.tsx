@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { ref, onValue } from "firebase/database";
 import { db } from "../lib/firebase";
 import SearchInput from "../component/search";
-import { Product } from "../lib/data";
+import { Product, Categories } from "../lib/data";
 import ProductTable from "../component/product_table";
 
 export default function ProductDashboard() {
@@ -17,21 +17,37 @@ export default function ProductDashboard() {
     const productsRef = ref(db, "/");
     const unsubscribe = onValue(productsRef, (snapshot) => {
       const data = snapshot.val();
-      if (Array.isArray(data)) {
-        setProducts(data);
-      } else if (data) {
-        // If data is an object, convert to array
-        setProducts(Object.values(data));
+      console.log("🔥 Raw Firebase data:", data);
+
+      if (data) {
+        const arrayData = Array.isArray(data) ? data : Object.values(data);
+
+        const mapped: Product[] = arrayData.map((item: any) => ({
+          nama: item["Nama"] || "",
+          nim: item["NIM"] || "",
+          no_hp: item["Nomor Telepon"] || "",
+          nama_bisnis: item["Nama Bisnis"] || "",
+          tanggal_berdiri: item["Tanggal Berdiri"] || "",
+          kategori_bisnis: (item["Kategori Bisnis"] || "Others") as Categories,
+          nama_produk: item["Nama Produk"] || "",
+          harga_produk: item["Harga Produk"] || "",
+          tanggal_diserahkan: item["Tanggal Diserahkan"] || "",
+          foto_produk: item["Foto Produk"] || "",
+        }));
+
+        console.log("✅ Mapped products:", mapped);
+        setProducts(mapped);
       } else {
         setProducts([]);
       }
     });
+
     return () => unsubscribe();
   }, []);
 
   const handleSort = (key: keyof Product) => {
     if (key === sortKey) {
-      setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
       setSortKey(key);
       setSortOrder("asc");
@@ -90,8 +106,7 @@ export default function ProductDashboard() {
 
         <footer className="text-center mt-8 text-gray-500 text-sm">
           <p>
-            Showing {filteredAndSortedProducts.length} of {products.length}{" "}
-            products.
+            Showing {filteredAndSortedProducts.length} of {products.length} products.
           </p>
         </footer>
       </div>

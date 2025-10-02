@@ -104,38 +104,41 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
           )}
         </tbody>
       </table>
-
+      
       {/* Modal Detail */}
       {selected && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white p-6 rounded-lg w-96">
-            <h2 className="text-lg font-bold mb-3">{selected.nama_produk}</h2>
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
+            <h2 className="text-lg font-bold mb-3 text-gray-900">
+              {selected.nama_produk}
+              </h2>
 
-            {/* Foto Produk */}
-            {selected.foto_produk && (
-              <div className="mb-3">
-                <img
-                  src={selected.foto_produk}
-                  alt={selected.nama_produk}
-                  className="w-full h-48 object-cover rounded"
-                />
-              </div>
-            )}
-
-            <p><strong>Kategori:</strong> {selected.kategori_bisnis}</p>
-            <p><strong>Nama Bisnis:</strong> {selected.nama_bisnis}</p>
-            <p><strong>Tanggal Berdiri:</strong> {selected.tanggal_berdiri}</p>
-            <p><strong>Nomor Telepon:</strong> {selected.no_hp}</p>
-            <p><strong>Tanggal Diserahkan:</strong> {selected.tanggal_diserahkan}</p>
-
-            <div className="mt-4 flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setSelected(null)}>
-                Close
-              </Button>
-            </div>
-          </div>
+      {/* Foto Produk */}
+      {selected.foto_produk && (
+        <div className="mb-3">
+          <img
+            src={selected.foto_produk}
+            alt={selected.nama_produk}
+            className="w-full h-48 object-cover rounded"
+          />
         </div>
       )}
+
+      <p className="text-gray-800"><strong>Kategori:</strong> {selected.kategori_bisnis}</p>
+      <p className="text-gray-800"><strong>Nama Bisnis:</strong> {selected.nama_bisnis}</p>
+      <p className="text-gray-800"><strong>Tanggal Berdiri:</strong> {selected.tanggal_berdiri}</p>
+      <p className="text-gray-800"><strong>Nomor Telepon:</strong> {selected.no_hp}</p>
+      <p className="text-gray-800"><strong>Tanggal Diserahkan:</strong> {selected.tanggal_diserahkan}</p>
+
+      <div className="mt-4 flex justify-end gap-2">
+        <Button variant="secondary" onClick={() => setSelected(null)}>
+          Close
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
