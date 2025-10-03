@@ -13,12 +13,16 @@ export type Product = {
 
 
 export type Categories =
+  | 'Advertising, Printing, & Media'
+  | 'Ceramics, Glass & Porcelain'
   | 'Food & Beverages'
+  | 'Automotive & Components'
+  | 'Computer & Services'
+  | 'Wood Industry'
   | 'Fashion'
-  | 'Technology'
-  | 'Services'
-  | 'Health & Beauty'
-  | 'Education'
+  | 'Perdagangan'
+  | 'Craft / Kriya'
+  | 'Sports'
   | 'Others';
 
 
