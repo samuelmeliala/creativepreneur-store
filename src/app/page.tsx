@@ -1,11 +1,37 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
 import { ref, onValue } from "firebase/database";
 import { db } from "../lib/firebase";
 import SearchInput from "../component/search";
 import { Product, Categories } from "../lib/data";
 import ProductTable from "../component/product_table";
+
+type FirebaseProduct = Record<string, unknown>;
+const categoryList: Categories[] = [
+  "Advertising, Printing, & Media",
+  "Ceramics, Glass & Porcelain",
+  "Food & Beverages",
+  "Automotive & Components",
+  "Computer & Services",
+  "Wood Industry",
+  "Fashion",
+  "Perdagangan",
+  "Craft / Kriya",
+  "Sports",
+  "Others",
+];
+const toString = (value: unknown): string => (typeof value === "string" ? value : "");
+const normalizeCategory = (value: unknown): Categories => {
+  if (typeof value !== "string") {
+    return "Others";
+  }
+
+  return categoryList.includes(value as Categories)
+    ? (value as Categories)
+    : "Others";
+};
 
 export default function ProductDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -16,23 +42,28 @@ export default function ProductDashboard() {
   useEffect(() => {
     const productsRef = ref(db, "/");
     const unsubscribe = onValue(productsRef, (snapshot) => {
-      const data = snapshot.val();
+      const data = snapshot.val() as
+        | Record<string, FirebaseProduct>
+        | FirebaseProduct[]
+        | null;
       console.log("🔥 Raw Firebase data:", data);
 
       if (data) {
-        const arrayData = Array.isArray(data) ? data : Object.values(data);
+        const arrayData: FirebaseProduct[] = Array.isArray(data)
+          ? (data.filter(Boolean) as FirebaseProduct[])
+          : (Object.values(data) as FirebaseProduct[]);
 
-        const mapped: Product[] = arrayData.map((item: any) => ({
-          nama: item["Nama"] || "",
-          nim: item["NIM"] || "",
-          no_hp: item["Nomor Telepon"] || "",
-          nama_bisnis: item["Nama Bisnis"] || "",
-          tanggal_berdiri: item["Tanggal Berdiri"] || "",
-          kategori_bisnis: (item["Kategori Bisnis"] || "Others") as Categories,
-          nama_produk: item["Nama Produk"] || "",
-          harga_produk: item["Harga Produk"] || "",
-          tanggal_diserahkan: item["Tanggal Diserahkan"] || "",
-          foto_produk: item["Foto Produk"] || "",
+        const mapped: Product[] = arrayData.map((item) => ({
+          nama: toString(item["Nama"]),
+          nim: toString(item["NIM"]),
+          no_hp: toString(item["Nomor Telepon"]),
+          nama_bisnis: toString(item["Nama Bisnis"]),
+          tanggal_berdiri: toString(item["Tanggal Berdiri"]),
+          kategori_bisnis: normalizeCategory(item["Kategori Bisnis"]),
+          nama_produk: toString(item["Nama Produk"]),
+          harga_produk: toString(item["Harga Produk"]),
+          tanggal_diserahkan: toString(item["Tanggal Diserahkan"]),
+          foto_produk: toString(item["Foto Produk"]),
         }));
 
         console.log("✅ Mapped products:", mapped);
@@ -57,11 +88,17 @@ export default function ProductDashboard() {
   const filteredAndSortedProducts = useMemo(() => {
     if (!Array.isArray(products)) return [];
 
-    const result = products.filter((product) =>
-      (product.nama_produk || "")
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-    );
+    const normalizedTerm = searchTerm.trim().toLowerCase();
+
+    const result = products.filter((product) => {
+      if (!normalizedTerm) return true;
+
+      const haystacks = [product.nama_produk, product.nama, product.nama_bisnis];
+
+      return haystacks.some((value) =>
+        (value ?? "").toLowerCase().includes(normalizedTerm)
+      );
+    });
 
     result.sort((a, b) => {
       const valA = a[sortKey];
@@ -89,12 +126,22 @@ export default function ProductDashboard() {
           </p>
         </header>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-8 space-y-6">
-          <SearchInput
-            value={searchTerm}
-            onChange={setSearchTerm}
-            onClear={() => setSearchTerm("")}
-          />
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="w-full sm:flex-1 sm:max-w-3xl">
+              <SearchInput
+                value={searchTerm}
+                onChange={setSearchTerm}
+                onClear={() => setSearchTerm("")}
+              />
+            </div>
+            <Link
+              href="/newproduct"
+              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow transition-colors hover:bg-blue-700"
+            >
+              Add Product
+            </Link>
+          </div>
         </div>
 
         <ProductTable

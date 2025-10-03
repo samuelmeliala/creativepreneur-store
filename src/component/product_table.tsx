@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { Product } from "../lib/data";
+import { Product, Categories } from "../lib/data";
 import { Button } from "../component/ui/button";
 
 type ProductTableProps = {
@@ -22,10 +22,25 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
       : <ChevronDown className="h-4 w-4 text-gray-800" />;
   };
 
+  const categoryColors: Record<Categories, string> = {
+    'Advertising, Printing, & Media': 'bg-blue-100 text-blue-800',
+    'Ceramics, Glass & Porcelain': 'bg-slate-100 text-slate-800',
+    'Food & Beverages': 'bg-amber-100 text-amber-800',
+    'Automotive & Components': 'bg-rose-100 text-rose-800',
+    'Computer & Services': 'bg-indigo-100 text-indigo-800',
+    'Wood Industry': 'bg-emerald-100 text-emerald-800',
+    'Fashion': 'bg-pink-100 text-pink-800',
+    'Perdagangan': 'bg-orange-100 text-orange-800',
+    'Craft / Kriya': 'bg-cyan-100 text-cyan-800',
+    'Sports': 'bg-yellow-100 text-yellow-800',
+    'Others': 'bg-gray-100 text-gray-800',
+  };
+
   const headers: { key: keyof Product; label: string }[] = [
     { key: 'nama_produk', label: 'Nama Produk' },
     { key: 'nama', label: 'Nama Mahasiswa' },
     { key: 'nim', label: 'NIM' },
+    { key: 'kategori_bisnis', label: 'Kategori' },
     { key: 'harga_produk', label: 'Harga Produk' },
   ];
 
@@ -79,6 +94,13 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
                   ))}
                 </td>
 
+                {/* Kategori */}
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${categoryColors[items[0].kategori_bisnis]}`}>
+                    {items[0].kategori_bisnis}
+                  </span>
+                </td>
+
                 {/* Harga Produk */}
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {items[0].harga_produk}
@@ -97,7 +119,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
             ))
           ) : (
             <tr>
-              <td colSpan={5} className="text-center py-10 text-gray-500">
+              <td colSpan={6} className="text-center py-10 text-gray-500">
                 No products found. Try adjusting your filters.
               </td>
             </tr>
