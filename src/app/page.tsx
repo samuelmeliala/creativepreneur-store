@@ -120,9 +120,9 @@ export default function ProductDashboard() {
     <div className="min-h-screen bg-gray-100 font-sans p-4 sm:p-6 lg:p-8">
       <div className="max-w-full mx-auto">
         <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800">Product Dashboard</h1>
+          <h1 className="text-4xl font-bold text-gray-800">Creativepreneur Store Dashboard</h1>
           <p className="text-lg text-gray-600 mt-1">
-            Manage and view your product inventory.
+            Product Inventory Management.
           </p>
         </header>
 
