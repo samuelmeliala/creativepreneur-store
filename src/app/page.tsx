@@ -7,6 +7,7 @@ import { db } from "../lib/firebase";
 import SearchInput from "../component/search";
 import { Product, Categories } from "../lib/data";
 import ProductTable from "../component/product_table";
+import { Button } from "../component/ui/button";
 
 type FirebaseProduct = Record<string, unknown>;
 const categoryList: Categories[] = [
@@ -93,7 +94,7 @@ export default function ProductDashboard() {
     const result = products.filter((product) => {
       if (!normalizedTerm) return true;
 
-      const haystacks = [product.nama_produk, product.nama, product.nama_bisnis];
+      const haystacks = [product.nama_produk, product.nama, product.nama_bisnis, product.nim];
 
       return haystacks.some((value) =>
         (value ?? "").toLowerCase().includes(normalizedTerm)
@@ -117,16 +118,16 @@ export default function ProductDashboard() {
   }, [products, searchTerm, sortKey, sortOrder]);
 
   return (
-    <div className="min-h-screen bg-gray-100 font-sans p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-[#DBE2EF] font-sans p-4 sm:p-6 lg:p-8">
       <div className="max-w-full mx-auto">
         <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800">Creativepreneur Store Dashboard</h1>
-          <p className="text-lg text-gray-600 mt-1">
+          <h1 className="text-4xl font-bold text-[#112D4E]">Creativepreneur Store Dashboard</h1>
+          <p className="text-lg text-[#112D4E] mt-1">
             Product Inventory Management.
           </p>
         </header>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
+        <div className="bg-[#3F72AF] rounded-lg shadow p-6 mb-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="w-full sm:flex-1 sm:max-w-3xl">
               <SearchInput
@@ -135,11 +136,10 @@ export default function ProductDashboard() {
                 onClear={() => setSearchTerm("")}
               />
             </div>
-            <Link
-              href="/newproduct"
-              className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow transition-colors hover:bg-blue-700"
-            >
-              Add Product
+            <Link href="/newproduct">
+              <Button>
+                Add Product
+              </Button>
             </Link>
           </div>
         </div>

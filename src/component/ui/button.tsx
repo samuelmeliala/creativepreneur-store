@@ -16,7 +16,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   switch (variant) {
     case "primary":
-      styles = "bg-blue-600 text-white hover:bg-blue-700";
+      styles = "bg-[#112D4E] text-white hover:bg-[#0B1F36]";
       break;
     case "secondary":
       styles = "bg-gray-200 text-gray-700 hover:bg-gray-300";
