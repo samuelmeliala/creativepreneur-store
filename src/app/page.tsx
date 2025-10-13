@@ -5,39 +5,19 @@ import Link from "next/link";
 import { ref, onValue } from "firebase/database";
 import { db } from "../lib/firebase";
 import SearchInput from "../component/search";
-import { Product, Categories } from "../lib/data";
+import {
+  Product,
+  FirebaseProduct,
+  mapFirebaseProduct,
+  ProductSortKey,
+} from "../lib/data";
 import ProductTable from "../component/product_table";
 import { Button } from "../component/ui/button";
-
-type FirebaseProduct = Record<string, unknown>;
-const categoryList: Categories[] = [
-  "Advertising, Printing, & Media",
-  "Ceramics, Glass & Porcelain",
-  "Food & Beverages",
-  "Automotive & Components",
-  "Computer & Services",
-  "Wood Industry",
-  "Fashion",
-  "Perdagangan",
-  "Craft / Kriya",
-  "Sports",
-  "Others",
-];
-const toString = (value: unknown): string => (typeof value === "string" ? value : "");
-const normalizeCategory = (value: unknown): Categories => {
-  if (typeof value !== "string") {
-    return "Others";
-  }
-
-  return categoryList.includes(value as Categories)
-    ? (value as Categories)
-    : "Others";
-};
 
 export default function ProductDashboard() {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortKey, setSortKey] = useState<keyof Product>("nama_produk");
+  const [sortKey, setSortKey] = useState<ProductSortKey>("nama_produk");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   useEffect(() => {
@@ -50,22 +30,17 @@ export default function ProductDashboard() {
       console.log("🔥 Raw Firebase data:", data);
 
       if (data) {
-        const arrayData: FirebaseProduct[] = Array.isArray(data)
-          ? (data.filter(Boolean) as FirebaseProduct[])
-          : (Object.values(data) as FirebaseProduct[]);
-
-        const mapped: Product[] = arrayData.map((item) => ({
-          nama: toString(item["Nama"]),
-          nim: toString(item["NIM"]),
-          no_hp: toString(item["Nomor Telepon"]),
-          nama_bisnis: toString(item["Nama Bisnis"]),
-          tanggal_berdiri: toString(item["Tanggal Berdiri"]),
-          kategori_bisnis: normalizeCategory(item["Kategori Bisnis"]),
-          nama_produk: toString(item["Nama Produk"]),
-          harga_produk: toString(item["Harga Produk"]),
-          tanggal_diserahkan: toString(item["Tanggal Diserahkan"]),
-          foto_produk: toString(item["Foto Produk"]),
-        }));
+        const mapped: Product[] = Array.isArray(data)
+          ? (data
+              .map((item, index) =>
+                item
+                  ? mapFirebaseProduct(String(index), item as FirebaseProduct)
+                  : null
+              )
+              .filter(Boolean) as Product[])
+          : Object.entries(data).map(([id, value]) =>
+              mapFirebaseProduct(id, value as FirebaseProduct)
+            );
 
         console.log("✅ Mapped products:", mapped);
         setProducts(mapped);
@@ -77,7 +52,7 @@ export default function ProductDashboard() {
     return () => unsubscribe();
   }, []);
 
-  const handleSort = (key: keyof Product) => {
+  const handleSort = (key: ProductSortKey) => {
     if (key === sortKey) {
       setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
@@ -94,7 +69,14 @@ export default function ProductDashboard() {
     const result = products.filter((product) => {
       if (!normalizedTerm) return true;
 
-      const haystacks = [product.nama_produk, product.nama, product.nama_bisnis, product.nim];
+      const haystacks = [
+        product.nama_produk,
+        product.nama,
+        product.nama_bisnis,
+        product.nim,
+        product.lokasi_status,
+        product.stok_barang,
+      ];
 
       return haystacks.some((value) =>
         (value ?? "").toLowerCase().includes(normalizedTerm)
