@@ -1,29 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
-import { Product, Categories } from "../lib/data";
+import React, { useEffect, useMemo, useState } from "react";
+import { ProductPayload, Categories, CATEGORY_LIST } from "../lib/data";
 import { Button } from "../component/ui/button";
 
-export type ProductFormData = Product;
+export type ProductFormData = ProductPayload;
 
 type ProductFormProps = {
   isSubmitting: boolean;
   onSubmit: (product: ProductFormData) => Promise<void> | void;
+  initialData?: ProductFormData;
+  submitLabel?: string;
+  onCancel?: () => void;
+  lokasiEditable?: boolean;
+  participantEditable?: boolean;
 };
 
-const CATEGORY_OPTIONS: Categories[] = [
-  'Advertising, Printing, & Media',
-  'Ceramics, Glass & Porcelain',
-  'Food & Beverages',
-  'Automotive & Components',
-  'Computer & Services',
-  'Wood Industry',
-  'Fashion',
-  'Perdagangan',
-  'Craft / Kriya',
-  'Sports',
-  'Others',
-];
+const CATEGORY_OPTIONS: Categories[] = CATEGORY_LIST;
+
+const DEFAULT_LOKASI = "Lokasi akan ditentukan melalui proses review";
 
 const INITIAL_FORM_STATE: ProductFormData = {
   nama: "",
@@ -36,10 +31,35 @@ const INITIAL_FORM_STATE: ProductFormData = {
   harga_produk: "",
   tanggal_diserahkan: "",
   foto_produk: "",
+  lokasi_status: DEFAULT_LOKASI,
+  stok_barang: "",
 };
 
-const ProductForm: React.FC<ProductFormProps> = ({ isSubmitting, onSubmit }) => {
-  const [formData, setFormData] = useState<ProductFormData>(INITIAL_FORM_STATE);
+const ProductForm: React.FC<ProductFormProps> = ({
+  isSubmitting,
+  onSubmit,
+  initialData,
+  submitLabel = "Save Product",
+  onCancel,
+  lokasiEditable = true,
+  participantEditable = true,
+}) => {
+  const resolvedInitial = useMemo(() => {
+    if (initialData) {
+      return {
+        ...INITIAL_FORM_STATE,
+        ...initialData,
+        lokasi: initialData.lokasi_status || DEFAULT_LOKASI,
+      };
+    }
+    return INITIAL_FORM_STATE;
+  }, [initialData]);
+
+  const [formData, setFormData] = useState<ProductFormData>(resolvedInitial);
+
+  useEffect(() => {
+    setFormData(resolvedInitial);
+  }, [resolvedInitial]);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -53,7 +73,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ isSubmitting, onSubmit }) => 
     await onSubmit(formData);
   };
 
-  const resetForm = () => setFormData(INITIAL_FORM_STATE);
+  const resetForm = () => setFormData(resolvedInitial);
 
   return (
     <form
@@ -72,9 +92,14 @@ const ProductForm: React.FC<ProductFormProps> = ({ isSubmitting, onSubmit }) => 
               value={formData.nama}
               onChange={handleChange}
               required
+              readOnly={!participantEditable}
+              disabled={!participantEditable}
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
               placeholder="John Doe"
             />
+            {!participantEditable && (
+              <p className="mt-1 text-xs text-gray-500">Data mahasiswa tidak dapat diubah dari halaman ini.</p>
+            )}
           </div>
 
           <div>
@@ -87,6 +112,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ isSubmitting, onSubmit }) => 
               value={formData.nim}
               onChange={handleChange}
               required
+              readOnly={!participantEditable}
+              disabled={!participantEditable}
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
               placeholder="2501XXXXXX"
             />
@@ -102,6 +129,8 @@ const ProductForm: React.FC<ProductFormProps> = ({ isSubmitting, onSubmit }) => 
               value={formData.no_hp}
               onChange={handleChange}
               required
+              readOnly={!participantEditable}
+              disabled={!participantEditable}
               className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
               placeholder="08XXXXXXXXXX"
             />
@@ -227,20 +256,71 @@ const ProductForm: React.FC<ProductFormProps> = ({ isSubmitting, onSubmit }) => 
               placeholder="https://"
             />
           </div>
+
+          <div>
+            <label htmlFor="lokasi" className="block text-sm font-medium text-gray-700">
+              Lokasi
+            </label>
+            <input
+              id="lokasi"
+              name="lokasi"
+              value={formData.lokasi_status}
+              onChange={handleChange}
+              required
+              readOnly={!lokasiEditable}
+              disabled={!lokasiEditable}
+              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              placeholder="Jakarta"
+            />
+            {!lokasiEditable && (
+              <p className="mt-1 text-xs text-gray-500">
+                Lokasi akan dikonfirmasi oleh admin setelah produk direview.
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="stok_barang" className="block text-sm font-medium text-gray-700">
+              Stok Barang
+            </label>
+            <input
+              id="stok_barang"
+              name="stok_barang"
+              type="number"
+              value={formData.stok_barang}
+              onChange={handleChange}
+              min="0"
+              required
+              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              placeholder="0"
+            />
+          </div>
         </div>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-200">
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={resetForm}
-          disabled={isSubmitting}
-        >
-          Reset
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={resetForm}
+            disabled={isSubmitting}
+          >
+            Reset
+          </Button>
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+          )}
+        </div>
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : "Add Product"}
+          {isSubmitting ? "Saving..." : submitLabel}
         </Button>
       </div>
     </form>
