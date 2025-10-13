@@ -136,11 +136,18 @@ export default function ProductDashboard() {
                 onClear={() => setSearchTerm("")}
               />
             </div>
-            <Link href="/newproduct">
-              <Button>
-                Add Product
-              </Button>
-            </Link>
+            <div className="flex gap-2">
+              <Link href="/newproduct">
+                <Button>
+                  Add Product
+                </Button>
+              </Link>
+              <Link href="/print">
+                <Button variant="secondary">
+                  Print Cards
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 
