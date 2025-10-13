@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ref, push } from "firebase/database";
 import ProductForm, { ProductFormData } from "../../component/product_form";
 import { db } from "../../lib/firebase";
+import { productToFirebasePayload } from "../../lib/data";
 import { Button } from "../../component/ui/button";
 
 const PRODUCTS_PATH = "/";
@@ -14,26 +15,13 @@ const AddProductPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const toPayload = (product: ProductFormData) => ({
-    "Nama": product.nama,
-    "NIM": product.nim,
-    "Nomor Telepon": product.no_hp,
-    "Nama Bisnis": product.nama_bisnis,
-    "Tanggal Berdiri": product.tanggal_berdiri,
-    "Kategori Bisnis": product.kategori_bisnis,
-    "Nama Produk": product.nama_produk,
-    "Harga Produk": product.harga_produk,
-    "Tanggal Diserahkan": product.tanggal_diserahkan,
-    "Foto Produk": product.foto_produk,
-  });
-
   const handleSubmit = async (product: ProductFormData) => {
     setIsSubmitting(true);
     setError(null);
 
     try {
       const productsRef = ref(db, PRODUCTS_PATH);
-      await push(productsRef, toPayload(product));
+      await push(productsRef, productToFirebasePayload(product));
       router.push("/");
     } catch (err) {
       console.error("Failed to add product", err);
@@ -65,7 +53,13 @@ const AddProductPage: React.FC = () => {
             {error}
           </div>
         )}
-        <ProductForm isSubmitting={isSubmitting} onSubmit={handleSubmit} />
+        <ProductForm
+          isSubmitting={isSubmitting}
+          onSubmit={handleSubmit}
+          submitLabel="Add Product"
+          onCancel={() => router.push("/")}
+          lokasiEditable={false}
+        />
       </div>
     </main>
   );
