@@ -11,8 +11,6 @@ export type Categories =
   | "Sports"
   | "Others";
 
-export type FirebaseProduct = Record<string, unknown>;
-
 export const CATEGORY_LIST: Categories[] = [
   "Advertising, Printing, & Media",
   "Ceramics, Glass & Porcelain",
@@ -27,19 +25,22 @@ export const CATEGORY_LIST: Categories[] = [
   "Others",
 ];
 
+export type FirebaseProduct = Record<string, unknown>;
+
 export type ProductPayload = {
-  nama: string; // dari "Nama"
-  nim: string; // dari "NIM"
-  no_hp: string; // dari "Nomor Telepon"
-  nama_bisnis: string; // dari "Nama Bisnis"
-  tanggal_berdiri: string; // dari "Tanggal Berdiri"
-  kategori_bisnis: Categories; // dari "Kategori Bisnis"
-  nama_produk: string; // dari "Nama Produk"
-  harga_produk: string; // dari "Harga Produk"
-  tanggal_diserahkan: string; // dari "Tanggal Diserahkan"
-  foto_produk: string; // dari "Foto Produk"
-  lokasi_status: string; // dari "Lokasi"
-  stok_barang: string; // dari "Stok Barang"
+  nama: string; // Nama
+  nim: string; // NIM
+  no_hp: string; // Nomor Telepon
+  nama_bisnis: string; // Nama Bisnis
+  tanggal_berdiri: string; // Tanggal Berdiri
+  tanggal_diserahkan: string; // Tanggal Diserahkan
+  nomer_induk_barang: string; // Nomer Induk Barang
+  lokasi_barang: string; // Lokasi Barang
+  kategori_bisnis: Categories; // Kategori Bisnis
+  nama_produk: string; // Nama Produk
+  stok_barang: string; // Stok Barang
+  harga_produk: string; // Harga Produk
+  foto_produk: string; // Foto Produk
 };
 
 export type Product = ProductPayload & {
@@ -48,31 +49,24 @@ export type Product = ProductPayload & {
 
 export type ProductSortKey = Exclude<keyof Product, "id">;
 
+// Helpers
 const toString = (value: unknown): string =>
   typeof value === "string" ? value : "";
 
 const toStockString = (value: unknown): string => {
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? String(value) : "";
-  }
-
-  if (typeof value === "string") {
-    return value;
-  }
-
+  if (typeof value === "number") return Number.isFinite(value) ? String(value) : "";
+  if (typeof value === "string") return value;
   return "";
 };
 
 export const normalizeCategory = (value: unknown): Categories => {
-  if (typeof value !== "string") {
-    return "Others";
-  }
-
+  if (typeof value !== "string") return "Others";
   return CATEGORY_LIST.includes(value as Categories)
     ? (value as Categories)
     : "Others";
 };
 
+// Mapping Firebase → Product
 export const mapFirebaseProduct = (
   id: string,
   data: FirebaseProduct
@@ -83,42 +77,45 @@ export const mapFirebaseProduct = (
   no_hp: toString(data["Nomor Telepon"]),
   nama_bisnis: toString(data["Nama Bisnis"]),
   tanggal_berdiri: toString(data["Tanggal Berdiri"]),
+  tanggal_diserahkan: toString(data["Tanggal Diserahkan"]),
+  nomer_induk_barang: toString(data["Nomer Induk Barang"]),
+  lokasi_barang: toString(data["Lokasi Barang"]),
   kategori_bisnis: normalizeCategory(data["Kategori Bisnis"]),
   nama_produk: toString(data["Nama Produk"]),
-  harga_produk: toString(data["Harga Produk"]),
-  tanggal_diserahkan: toString(data["Tanggal Diserahkan"]),
-  foto_produk: toString(data["Foto Produk"]),
-  lokasi_status: toString(data["Lokasi"]),
   stok_barang: toStockString(data["Stok Barang"]),
+  harga_produk: toString(data["Harga Produk"]),
+  foto_produk: toString(data["Foto Produk"]),
 });
 
+// Mapping Product → Firebase payload (untuk simpan)
 export const productToFirebasePayload = (product: ProductPayload) => ({
-  Nama: product.nama,
-  NIM: product.nim,
-  "Nomor Telepon": product.no_hp,
-  "Nama Bisnis": product.nama_bisnis,
-  "Tanggal Berdiri": product.tanggal_berdiri,
-  "Kategori Bisnis": product.kategori_bisnis,
-  "Nama Produk": product.nama_produk,
-  "Harga Produk": product.harga_produk,
-  "Tanggal Diserahkan": product.tanggal_diserahkan,
-  "Foto Produk": product.foto_produk,
-  Lokasi: product.lokasi_status,
-  "Stok Barang": product.stok_barang,
+  Nama: product.nama ?? "",
+  NIM: product.nim ?? "",
+  "Nomor Telepon": product.no_hp ?? "",
+  "Nama Bisnis": product.nama_bisnis ?? "",
+  "Tanggal Berdiri": product.tanggal_berdiri ?? "",
+  "Tanggal Diserahkan": product.tanggal_diserahkan ?? "",
+  "Nomer Induk Barang": product.nomer_induk_barang ?? "",
+  "Lokasi Barang": product.lokasi_barang ?? "",
+  "Kategori Bisnis": product.kategori_bisnis ?? "Others",
+  "Nama Produk": product.nama_produk ?? "",
+  "Stok Barang": product.stok_barang ?? "",
+  "Harga Produk": product.harga_produk ?? "",
+  "Foto Produk": product.foto_produk ?? "",
 });
 
+// Payload versi sharing (tanpa data pribadi)
 export const productToSharedFirebasePayload = (product: ProductPayload) => ({
-  "Nama Bisnis": product.nama_bisnis,
-  "Tanggal Berdiri": product.tanggal_berdiri,
-  "Kategori Bisnis": product.kategori_bisnis,
-  "Nama Produk": product.nama_produk,
-  "Harga Produk": product.harga_produk,
-  "Tanggal Diserahkan": product.tanggal_diserahkan,
-  "Foto Produk": product.foto_produk,
-  Lokasi: product.lokasi_status,
-  "Stok Barang": product.stok_barang,
+  "Nama Bisnis": product.nama_bisnis ?? "",
+  "Tanggal Berdiri": product.tanggal_berdiri ?? "",
+  "Tanggal Diserahkan": product.tanggal_diserahkan ?? "",
+  "Nomer Induk Barang": product.nomer_induk_barang ?? "",
+  "Lokasi Barang": product.lokasi_barang ?? "",
+  "Kategori Bisnis": product.kategori_bisnis ?? "Others",
+  "Nama Produk": product.nama_produk ?? "",
+  "Stok Barang": product.stok_barang ?? "",
+  "Harga Produk": product.harga_produk ?? "",
+  "Foto Produk": product.foto_produk ?? "",
 });
 
 export const normalizeProductName = (value: string) => value.trim().toLowerCase();
-
-

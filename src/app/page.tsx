@@ -74,7 +74,7 @@ export default function ProductDashboard() {
         product.nama,
         product.nama_bisnis,
         product.nim,
-        product.lokasi_status,
+        product.lokasi_barang,
         product.stok_barang,
       ];
 
