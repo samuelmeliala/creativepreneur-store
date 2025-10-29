@@ -17,6 +17,26 @@ type GroupedProduct = {
   items: Product[];
 };
 
+function getDriveImageUrl(url?: string): string | undefined {
+  if (!url) return undefined;
+
+  // kalau URL dari Google Drive format standar
+  const fileIdMatch = url.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]+)/);
+  if (fileIdMatch && fileIdMatch[1]) {
+    return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
+  }
+
+  // kalau dari drive API format "open?id="
+  const openIdMatch = url.match(/open\?id=([a-zA-Z0-9_-]+)/);
+  if (openIdMatch && openIdMatch[1]) {
+    return `https://drive.google.com/uc?export=view&id=${openIdMatch[1]}`;
+  }
+
+  // fallback, kalau bukan dari drive
+  return url;
+}
+
+
 const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrder, onSort }) => {
   const [selectedGroup, setSelectedGroup] = useState<GroupedProduct | null>(null);
   const router = useRouter();
@@ -164,7 +184,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
             {selectedGroup.primary.foto_produk && (
               <div className="mb-3">
                 <img
-                  src={selectedGroup.primary.foto_produk}
+                  src={getDriveImageUrl(selectedGroup.primary.foto_produk)}
                   alt={selectedGroup.primary.nama_produk}
                   className="w-full h-48 object-cover rounded"
                 />
