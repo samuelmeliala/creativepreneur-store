@@ -31,6 +31,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
   const categoryColors: Record<Categories, string> = {
     "Advertising, Printing, & Media": "bg-blue-100 text-blue-800",
     "Ceramics, Glass & Porcelain": "bg-slate-100 text-slate-800",
+    "Cosmetics & Household": "bg-rose-100 text-rose-800",
     "Food & Beverages": "bg-amber-100 text-amber-800",
     "Automotive & Components": "bg-rose-100 text-rose-800",
     "Computer & Services": "bg-indigo-100 text-indigo-800",
@@ -131,11 +132,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
                   <td className="px-6 py-4 text-sm text-gray-500">{primary.harga_produk}</td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-3">
-                      <Button variant="outline" onClick={() => setSelectedGroup(group)}>
-                        More Details
+                      <Button variant="table" onClick={() => setSelectedGroup(group)}>
+                        Details
                       </Button>
-                      <Button variant="secondary" onClick={() => router.push(`/edit/${primary.id}`)}>
-                        Edit Product
+                      <Button variant="table" onClick={() => router.push(`/edit/${primary.id}`)}>
+                        Edit
                       </Button>
                     </div>
                   </td>
