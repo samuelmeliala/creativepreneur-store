@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ProductPayload, Categories, CATEGORY_LIST } from "../lib/data";
 import { Button } from "../component/ui/button";
+import { saveProductWithCloudinary } from "../lib/saveProductCloud";
 
 export type ProductFormData = ProductPayload;
 
@@ -18,7 +19,7 @@ type ProductFormProps = {
 
 const CATEGORY_OPTIONS: Categories[] = CATEGORY_LIST;
 
-const DEFAULT_LOKASI = "Lokasi akan ditentukan melalui proses review";
+const DEFAULT_LOKASI = "Binus Bandung Paskal";
 
 const INITIAL_FORM_STATE: ProductFormData = {
   nama: "",
@@ -31,7 +32,8 @@ const INITIAL_FORM_STATE: ProductFormData = {
   harga_produk: "",
   tanggal_diserahkan: "",
   foto_produk: "",
-  lokasi_status: DEFAULT_LOKASI,
+  nomer_induk_barang: "",
+  lokasi_barang: DEFAULT_LOKASI,
   stok_barang: "",
 };
 
@@ -44,12 +46,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
   lokasiEditable = true,
   participantEditable = true,
 }) => {
+  const isEditing = Boolean(initialData);
+
   const resolvedInitial = useMemo(() => {
     if (initialData) {
       return {
         ...INITIAL_FORM_STATE,
         ...initialData,
-        lokasi: initialData.lokasi_status || DEFAULT_LOKASI,
+        lokasi_barang: initialData.lokasi_barang || DEFAULT_LOKASI,
       };
     }
     return INITIAL_FORM_STATE;
@@ -57,9 +61,59 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   const [formData, setFormData] = useState<ProductFormData>(resolvedInitial);
 
+  // NEW: hold selected file + preview (not in your payload)
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>("");
+
   useEffect(() => {
     setFormData(resolvedInitial);
-  }, [resolvedInitial]);
+    setFile(null);
+    setPreview(initialData?.foto_produk ? initialData.foto_produk : "");
+  }, [resolvedInitial, initialData?.foto_produk]);
+
+  const isFieldDisabled = (field: keyof ProductFormData) => {
+    if (isEditing) {
+      // When editing only lokasi_barang and stok_barang are editable
+      if (field === "lokasi_barang") return !lokasiEditable;
+      if (field === "stok_barang") return false;
+      return true;
+    }
+
+    // Not editing: follow props for participant / lokasi fields
+    if (
+      field === "nama" ||
+      field === "nim" ||
+      field === "no_hp" ||
+      field === "nama_bisnis" ||
+      field === "tanggal_berdiri" ||
+      field === "nama_produk" ||
+      field === "harga_produk" ||
+      field === "tanggal_diserahkan" ||
+      field === "foto_produk"
+    ) {
+      return !participantEditable;
+    }
+    if (field === "lokasi_barang") return !lokasiEditable;
+    return false;
+  };
+
+  const inputBaseClass =
+    "mt-1 w-full rounded-md border px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500";
+
+  const getInputClass = (field: keyof ProductFormData) => {
+    const disabled = isFieldDisabled(field);
+    // When disabled, use gray text and slightly muted bg + gray border
+    if (disabled) {
+      return (
+        inputBaseClass +
+        " bg-gray-50 text-gray-500 border-gray-200 placeholder-gray-400"
+      );
+    }
+    return inputBaseClass + " border-gray-300 text-black placeholder-gray-400";
+  };
+
+  // File input ref (used by the "Pilih Gambar" button)
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -68,12 +122,71 @@ const ProductForm: React.FC<ProductFormProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    await onSubmit(formData);
+  // NEW: handle the file input separately (uncontrolled).
+  const handleFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const f = event.target.files?.[0] ?? null;
+    setFile(f);
+    const url = f ? URL.createObjectURL(f) : "";
+    setPreview(url);
+    if (url) {
+      setFormData((prev) => ({ ...prev, foto_produk: url }));
+    }
   };
 
-  const resetForm = () => setFormData(resolvedInitial);
+  // Revoke object URL when preview changes or component unmounts
+  useEffect(() => {
+    return () => {
+      if (preview && preview.startsWith("blob:")) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    // If a new file is picked, upload it and set foto_produk to the URL
+    let payload: ProductFormData = { ...formData };
+
+    if (file && !isFieldDisabled("foto_produk")) {
+      if (!file.type.startsWith("image/")) {
+        alert("File harus berupa gambar.");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Ukuran gambar harus < 5MB.");
+        return;
+      }
+
+      // Upload -> get URL
+      const { imageUrl } = await saveProductWithCloudinary(file, {
+      name: formData.nama_produk || "Produk",
+      price: Number(String(formData.harga_produk).replace(/[^\d]/g, "") || 0),
+      category: String(formData.kategori_bisnis),
+      description: formData.nama_bisnis || "",
+    });
+
+      payload = { ...payload, foto_produk: imageUrl };
+    }
+
+    // Submit the final payload (with uploaded image URL when applicable)
+    await onSubmit(payload);
+
+    // Cleanup blob preview and file state after successful submit
+    if (preview && preview.startsWith("blob:")) {
+      try {
+        URL.revokeObjectURL(preview);
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    setFile(null);
+    setPreview("");
+  };
+
+  const resetForm = () => {
+    setFormData(resolvedInitial);
+    setFile(null);
+    setPreview("");
+  };
 
   return (
     <form
@@ -92,12 +205,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.nama}
               onChange={handleChange}
               required
-              readOnly={!participantEditable}
-              disabled={!participantEditable}
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              readOnly={isFieldDisabled("nama")}
+              disabled={isFieldDisabled("nama")}
+              className={getInputClass("nama")}
               placeholder="John Doe"
             />
-            {!participantEditable && (
+            {isFieldDisabled("nama") && (
               <p className="mt-1 text-xs text-gray-500">Data mahasiswa tidak dapat diubah dari halaman ini.</p>
             )}
           </div>
@@ -112,9 +225,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.nim}
               onChange={handleChange}
               required
-              readOnly={!participantEditable}
-              disabled={!participantEditable}
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              readOnly={isFieldDisabled("nim")}
+              disabled={isFieldDisabled("nim")}
+              className={getInputClass("nim")}
               placeholder="2501XXXXXX"
             />
           </div>
@@ -129,9 +242,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.no_hp}
               onChange={handleChange}
               required
-              readOnly={!participantEditable}
-              disabled={!participantEditable}
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              readOnly={isFieldDisabled("no_hp")}
+              disabled={isFieldDisabled("no_hp")}
+              className={getInputClass("no_hp")}
               placeholder="08XXXXXXXXXX"
             />
           </div>
@@ -146,7 +259,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.nama_bisnis}
               onChange={handleChange}
               required
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              readOnly={isFieldDisabled("nama_bisnis")}
+              disabled={isFieldDisabled("nama_bisnis")}
+              className={getInputClass("nama_bisnis")}
               placeholder="Nama brand"
             />
           </div>
@@ -161,13 +276,99 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <input
               id="tanggal_berdiri"
               name="tanggal_berdiri"
-              type="date"
               value={formData.tanggal_berdiri}
               onChange={handleChange}
               required
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              readOnly={isFieldDisabled("tanggal_berdiri")}
+              disabled={isFieldDisabled("tanggal_berdiri")}
+              className={getInputClass("tanggal_berdiri")}
+              placeholder="1 Januari 2099"
             />
           </div>
+          
+          <div>
+            <label htmlFor="foto_produk" className="block text-sm font-medium text-gray-700">
+              Foto Produk
+            </label>
+            <input
+              id="foto_produk"
+              name="foto_produk"
+              type="file"
+              accept="image/*"
+              onChange={handleFile}
+              ref={(el) => {
+                fileInputRef.current = el;
+              }}
+              readOnly={isFieldDisabled("foto_produk")}
+              disabled={isFieldDisabled("foto_produk")}
+              className="sr-only"
+            />
+            <div className="mt-2 flex items-center gap-2">
+              <Button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isFieldDisabled("foto_produk")}
+              >
+                Pilih Gambar
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  // Clear the native file input's value so the browser UI shows no file selected
+                  if (fileInputRef.current) {
+                    try {
+                      fileInputRef.current.value = "";
+                    } catch (_) {
+                      /* ignore */
+                    }
+                  }
+
+                  // Revoke blob preview URL if present
+                  if (preview && preview.startsWith("blob:")) {
+                    try {
+                      URL.revokeObjectURL(preview);
+                    } catch (_) {
+                      /* ignore */
+                    }
+                  }
+
+                  setFile(null);
+                  setPreview("");
+                  setFormData((prev) => ({ ...prev, foto_produk: "" }));
+                }}
+                disabled={isFieldDisabled("foto_produk")}
+              >
+                Hapus
+              </Button>
+            </div>
+            <div className="mt-2">
+              <div
+                className={
+                  "w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 truncate"
+                }
+                title={file?.name || (formData.foto_produk ? String(formData.foto_produk).split("/").pop() : "No file selected")}
+              >
+                {file?.name || (formData.foto_produk ? String(formData.foto_produk).split("/").pop() : "No file selected")}
+              </div>
+            </div>
+
+            {preview && (
+              <img
+                src={preview}
+                alt="Preview"
+                className="mt-2 h-32 object-cover rounded"
+              />
+            )}
+            {!!formData.foto_produk && !preview && (
+              <img
+                src={formData.foto_produk}
+                alt="Current"
+                className="mt-2 h-32 object-cover rounded"
+              />
+            )}
+          </div>
+          
         </div>
 
         <div className="space-y-4">
@@ -184,7 +385,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.kategori_bisnis}
               onChange={handleChange}
               required
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              disabled={isFieldDisabled("kategori_bisnis")}
+              className={getInputClass("kategori_bisnis")}
             >
               {CATEGORY_OPTIONS.map((category) => (
                 <option key={category} value={category}>
@@ -204,7 +406,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.nama_produk}
               onChange={handleChange}
               required
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              readOnly={isFieldDisabled("nama_produk")}
+              disabled={isFieldDisabled("nama_produk")}
+              className={getInputClass("nama_produk")}
               placeholder="Nama produk"
             />
           </div>
@@ -219,7 +423,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.harga_produk}
               onChange={handleChange}
               required
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              readOnly={isFieldDisabled("harga_produk")}
+              disabled={isFieldDisabled("harga_produk")}
+              className={getInputClass("harga_produk")}
               placeholder="RpXXX.XXX"
             />
           </div>
@@ -234,45 +440,34 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <input
               id="tanggal_diserahkan"
               name="tanggal_diserahkan"
-              type="date"
               value={formData.tanggal_diserahkan}
               onChange={handleChange}
               required
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              readOnly={isFieldDisabled("tanggal_diserahkan")}
+              disabled={isFieldDisabled("tanggal_diserahkan")}
+              className={getInputClass("tanggal_diserahkan")}
+              placeholder="1 Januari 2099"
             />
           </div>
 
-          <div>
-            <label htmlFor="foto_produk" className="block text-sm font-medium text-gray-700">
-              URL Foto Produk
-            </label>
-            <input
-              id="foto_produk"
-              name="foto_produk"
-              value={formData.foto_produk}
-              onChange={handleChange}
-              required
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-              placeholder="https://"
-            />
-          </div>
+          
 
           <div>
-            <label htmlFor="lokasi" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="lokasi_barang" className="block text-sm font-medium text-gray-700">
               Lokasi
             </label>
             <input
-              id="lokasi"
-              name="lokasi"
-              value={formData.lokasi_status}
+              id="lokasi_barang"
+              name="lokasi_barang"
+              value={formData.lokasi_barang}
               onChange={handleChange}
               required
-              readOnly={!lokasiEditable}
-              disabled={!lokasiEditable}
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              readOnly={isFieldDisabled("lokasi_barang")}
+              disabled={isFieldDisabled("lokasi_barang")}
+              className={getInputClass("lokasi_barang")}
               placeholder="Jakarta"
             />
-            {!lokasiEditable && (
+            {isFieldDisabled("lokasi_barang") && (
               <p className="mt-1 text-xs text-gray-500">
                 Lokasi akan dikonfirmasi oleh admin setelah produk direview.
               </p>
@@ -291,7 +486,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
               onChange={handleChange}
               min="0"
               required
-              className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+              readOnly={isFieldDisabled("stok_barang")}
+              disabled={isFieldDisabled("stok_barang")}
+              className={getInputClass("stok_barang")}
               placeholder="0"
             />
           </div>

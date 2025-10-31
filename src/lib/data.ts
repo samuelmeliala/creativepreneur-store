@@ -9,11 +9,13 @@ export type Categories =
   | "Perdagangan"
   | "Craft / Kriya"
   | "Sports"
+  | "Cosmetics & Household"
   | "Others";
 
 export const CATEGORY_LIST: Categories[] = [
   "Advertising, Printing, & Media",
   "Ceramics, Glass & Porcelain",
+  "Cosmetics & Household",
   "Food & Beverages",
   "Automotive & Components",
   "Computer & Services",
