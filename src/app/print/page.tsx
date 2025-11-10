@@ -29,8 +29,10 @@ const normalizeCategory = (value: unknown): Categories => {
     : "Others";
 };
 
+
 export default function PrintProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const productsRef = ref(db, "/");
@@ -68,24 +70,46 @@ export default function PrintProductsPage() {
     window.print();
   };
 
+  // Filter products by search (nama_bisnis or kategori_bisnis)
+  const filteredProducts = products.filter((p) => {
+    const searchLower = search.toLowerCase();
+    return (
+      p.nama_bisnis.toLowerCase().includes(searchLower) ||
+      p.kategori_bisnis.toLowerCase().includes(searchLower)
+    );
+  });
+
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-2 print:hidden">Print Product Cards</h1>
-      <div className="flex justify-between items-center mb-4 print:hidden">
-        <a
-          href="/"
-          className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors"
-        >
-          Back
-        </a>
-        <button
-          onClick={handlePrint}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-        >
-          Print
-        </button>
+    <div className="min-h-screen bg-[#DBE2EF] p-4">
+      <div className="bg-[#DBE2EF] p-0">
+        <h1 className="text-3xl font-bold mb-1 text-[#112D4E] print:hidden">Creativepreneur Store Print</h1>
+        <p className="text-[#112D4E] mb-4 print:hidden">Print QR Cards for Products.</p>
+        <div className="bg-[#3F72AF] rounded-xl px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 shadow print:hidden">
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search by business name or category..."
+            className="w-full sm:w-96 px-4 py-2 rounded bg-white text-[#112D4E] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 shadow"
+            style={{ minWidth: 0 }}
+          />
+          <div className="flex gap-2">
+            <a
+              href="/"
+              className="px-4 py-2 bg-white text-[#112D4E] font-semibold rounded hover:bg-gray-200 transition-colors shadow"
+            >
+              Back
+            </a>
+            <button
+              onClick={handlePrint}
+              className="px-4 py-2 bg-[#112D4E] text-white font-semibold rounded hover:bg-blue-900 transition-colors shadow"
+            >
+              Print
+            </button>
+          </div>
+        </div>
       </div>
-      <ProductPrintList products={products} />
+      <ProductPrintList products={filteredProducts} />
     </div>
   );
 }
