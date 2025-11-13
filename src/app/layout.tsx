@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css"; // Assuming you have a global CSS file
+import Sidebar from "../component/sidebar";
 
 const openSans = Open_Sans({ subsets: ["latin"] });
 
@@ -17,10 +18,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={openSans.className}>
-        <main>
-          {/* The 'children' prop is where your page.tsx content will be rendered */}
-          {children}
-        </main>
+        <div className="min-h-screen flex bg-[#F7FAFC]">
+          <Sidebar />
+          <main className="flex-1">
+            {/* The 'children' prop is where your page.tsx content will be rendered */}
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );
