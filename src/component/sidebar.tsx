@@ -51,16 +51,16 @@ export default function Sidebar() {
       </div>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex md:flex-col md:w-64 md:shrink-0 bg-white border-r">
-        <div className="p-6">
-          <div className="text-2xl font-bold text-[#112D4E] mb-2">Creativepreneur</div>
-          <p className="text-sm text-gray-600">Store Dashboard</p>
+      <aside className="hidden md:flex md:flex-col md:w-52 md:shrink-0 bg-white border-r fixed top-0 left-0 h-screen z-30">
+        <div className="p-4">
+          <div className="text-lg font-bold text-[#112D4E] mb-1">Creativepreneur</div>
+          <p className="text-xs text-gray-600">Store Dashboard</p>
         </div>
-        <nav className="flex-1 p-4 space-y-1 text-[#112D4E]">
-          <NavLink href="/dashboard">Dashboard</NavLink>
-          <NavLink href="/productlist">Products</NavLink>
-          <NavLink href="/newproduct">Add Product</NavLink>
-          <NavLink href="/print">Print Cards</NavLink>
+        <nav className="flex-1 p-2 space-y-1 text-[#112D4E]">
+          <NavLink href="/dashboard"><span className="text-sm">Dashboard</span></NavLink>
+          <NavLink href="/productlist"><span className="text-sm">Products</span></NavLink>
+          <NavLink href="/newproduct"><span className="text-sm">Add Product</span></NavLink>
+          <NavLink href="/print"><span className="text-sm">Print Cards</span></NavLink>
         </nav>
       </aside>
     </>
