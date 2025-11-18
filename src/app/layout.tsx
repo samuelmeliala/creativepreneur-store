@@ -22,7 +22,7 @@ export default function RootLayout({
           <div className="print:hidden">
             <Sidebar />
           </div>
-          <main className="flex-1 md:ml-52 print:ml-0">
+          <main className="flex-1 print:ml-0">
             {/* The 'children' prop is where your page.tsx content will be rendered */}
             {children}
           </main>
