@@ -63,15 +63,15 @@ const ProductPrintCard: React.FC<ProductPrintCardProps> = ({ product, large = fa
   }, [product, large]);
 
   // sizing
-  const cardWidth = large ? '520px' : '320px';
+  const cardWidth = large ? '500px' : '280px';
   const cardHeight = large ? '320px' : '170px';
-  const padding = large ? '20px' : '14px';
-  const fontSize = large ? '14px' : '12px';
-  const qrDisplaySize = large ? 220 : 80;
+  const padding = large ? '24px' : '12px';
+  const fontSize = large ? '16px' : '10px';
+  const qrDisplaySize = large ? 220 : 90;
 
   return (
   <div
-    className={`print-card border border-gray-400 rounded shadow bg-white ${large ? '' : 'm-2'} flex flex-col justify-between items-start`}
+    className={`print-card border border-gray-400 rounded shadow bg-white ${large ? '' : 'm-2'} flex flex-col justify-between items-start print:border-black print:border-2`}
     style={{
       width: cardWidth,
       height: cardHeight,
@@ -84,18 +84,20 @@ const ProductPrintCard: React.FC<ProductPrintCardProps> = ({ product, large = fa
     }}
   >
     <div className="w-full flex flex-row justify-between items-start">
-      <div className="flex-1 min-w-0">
-        <div className="font-bold text-base mb-1 text-blue-900 truncate w-full" title={product.nama_bisnis}>
-          {product.nama_bisnis}
-        </div>
-        <div className="text-xs text-gray-700 mb-2 font-semibold">
-          {product.kategori_bisnis}
-        </div>
-        <div className="text-sm text-gray-900 font-medium break-words">
-          {product.nama_produk}
+      <div className="flex-1 min-w-0 flex flex-col justify-between">
+        <div>
+          <div className={`font-bold ${large ? 'text-xl' : 'text-sm'} mb-1 text-blue-900 truncate w-full`} title={product.nama_bisnis}>
+            {product.nama_bisnis}
+          </div>
+          <div className={`${large ? 'text-base' : 'text-[11px]'} text-gray-700 mb-1 font-semibold`}>
+            {product.kategori_bisnis}
+          </div>
+          <div className={`${large ? 'text-lg' : 'text-xs'} text-gray-900 font-medium break-words`}>
+            {product.nama_produk}
+          </div>
         </div>
       </div>
-      {/* QR code (generated offline as data URL from text payload) */}
+      {/* QR code (always show, but not too large) */}
       <div className="ml-2 flex-shrink-0 border border-dashed border-gray-300 rounded flex items-center justify-center bg-white" style={{ width: qrDisplaySize, height: qrDisplaySize }}>
         {qrSrc ? (
           <img src={qrSrc} alt="QR code" width={qrDisplaySize} height={qrDisplaySize} className="object-contain" />

@@ -1,3 +1,13 @@
+@media print {
+  .print\:hidden { display: none !important; }
+  .print\:block { display: block !important; }
+  body { background: white !important; }
+}
+
+@page {
+  size: A4 landscape;
+  margin: 0.5cm;
+}
 @import "tailwindcss";
 
 :root {
