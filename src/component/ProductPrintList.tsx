@@ -34,7 +34,7 @@ const ProductPrintList: React.FC<ProductPrintListProps> = ({ products }) => {
 
   return (
     <div className="bg-[#DBE2EF] p-4">
-      <div className="flex flex-wrap gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 print:grid-cols-3 print:grid-rows-3 print:gap-2 print:mx-auto print:w-full print:max-w-[1200px]">
         {uniqueGroups.map((group, idx) => (
           <div key={idx} onClick={() => setSelectedProduct(group.primary)} style={{ cursor: 'pointer' }}>
             <ProductPrintCard product={group.primary} team={group.team} />

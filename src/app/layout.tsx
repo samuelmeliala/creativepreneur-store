@@ -19,8 +19,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={openSans.className}>
         <div className="min-h-screen flex bg-[#F7FAFC]">
-          <Sidebar />
-          <main className="flex-1 md:ml-52">
+          <div className="print:hidden">
+            <Sidebar />
+          </div>
+          <main className="flex-1 md:ml-52 print:ml-0">
             {/* The 'children' prop is where your page.tsx content will be rendered */}
             {children}
           </main>

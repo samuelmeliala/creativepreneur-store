@@ -33,6 +33,15 @@ const normalizeCategory = (value: unknown): Categories => {
 export default function PrintProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Debounce only the filtering, not the input value
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 200);
+    return () => clearTimeout(handler);
+  }, [search]);
 
   useEffect(() => {
     const productsRef = ref(db, "/");
@@ -70,9 +79,9 @@ export default function PrintProductsPage() {
     window.print();
   };
 
-  // Filter products by search (nama_bisnis or kategori_bisnis)
+  // Filter products by debounced search (nama_bisnis or kategori_bisnis)
   const filteredProducts = products.filter((p) => {
-    const searchLower = search.toLowerCase();
+    const searchLower = debouncedSearch.toLowerCase();
     return (
       p.nama_bisnis.toLowerCase().includes(searchLower) ||
       p.kategori_bisnis.toLowerCase().includes(searchLower)
