@@ -32,20 +32,13 @@ const AddProductPage: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
-      <div className="mx-auto max-w-4xl space-y-6">
+    <main className="min-h-screen bg-[#DBE2EF] font-sans p-4 sm:p-6 lg:p-8">
+      <div className="max-w-full mx-auto space-y-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Add Product</h1>
-            <p className="text-gray-600">Fill in the form below to add a new product.</p>
-          </div>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => router.push("/")}
-          >
-            Back to Dashboard
-          </Button>
+          <header>
+            <h1 className="text-3xl font-bold text-[#112D4E]">Add Product</h1>
+            <p className="text-sm text-[#112D4E] mt-1">Fill in the form below to add a new product.</p>
+          </header>
         </div>
 
         {error && (

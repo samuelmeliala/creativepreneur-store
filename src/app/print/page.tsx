@@ -89,7 +89,7 @@ export default function PrintProductsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#DBE2EF] p-4">
+    <div className="min-h-screen bg-[#DBE2EF] font-sans p-4 sm:p-6 lg:p-8">
       <div className="bg-[#DBE2EF] p-0">
         <h1 className="text-3xl font-bold mb-1 text-[#112D4E] print:hidden">Creativepreneur Store Print</h1>
         <p className="text-[#112D4E] mb-4 print:hidden">Print QR Cards for Products.</p>
