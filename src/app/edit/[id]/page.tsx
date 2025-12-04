@@ -49,12 +49,12 @@ const EditProductPage: React.FC = () => {
           return;
         }
 
-    const data = snapshot.val() as FirebaseProduct;
-    const mapped = mapFirebaseProduct(productId, data);
-    setGroupKey(normalizeProductName(mapped.nama_produk));
-    const { id: ignoredId, ...payload } = mapped;
-    void ignoredId;
-    setInitialData(payload);
+        const data = snapshot.val() as FirebaseProduct;
+        const mapped = mapFirebaseProduct(productId, data);
+        setGroupKey(normalizeProductName(mapped.nama_produk));
+        const { id: ignoredId, ...payload } = mapped;
+        void ignoredId;
+        setInitialData(payload);
       })
       .catch((err) => {
         console.error("Failed to load product", err);
@@ -152,7 +152,6 @@ const EditProductPage: React.FC = () => {
             initialData={initialData}
             submitLabel="Update Product"
             onCancel={() => router.push("/")}
-            participantEditable={false}
           />
         )}
       </div>

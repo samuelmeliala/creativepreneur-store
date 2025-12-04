@@ -14,6 +14,7 @@ type ProductFormProps = {
   submitLabel?: string;
   onCancel?: () => void;
   lokasiEditable?: boolean;
+  stokEditable?: boolean;
   participantEditable?: boolean;
 };
 
@@ -44,9 +45,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
   submitLabel = "Save Product",
   onCancel,
   lokasiEditable = true,
+  stokEditable = true,
   participantEditable = true,
 }) => {
-  const isEditing = Boolean(initialData);
 
   const resolvedInitial = useMemo(() => {
     if (initialData) {
@@ -72,14 +73,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
   }, [resolvedInitial, initialData?.foto_produk]);
 
   const isFieldDisabled = (field: keyof ProductFormData) => {
-    if (isEditing) {
-      // When editing only lokasi_barang and stok_barang are editable
-      if (field === "lokasi_barang") return !lokasiEditable;
-      if (field === "stok_barang") return false;
-      return true;
-    }
-
-    // Not editing: follow props for participant / lokasi fields
     if (
       field === "nama" ||
       field === "nim" ||
@@ -94,6 +87,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       return !participantEditable;
     }
     if (field === "lokasi_barang") return !lokasiEditable;
+    if (field === "stok_barang") return !stokEditable;
     return false;
   };
 
@@ -205,8 +199,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.nama}
               onChange={handleChange}
               required
-              readOnly={isFieldDisabled("nama")}
-              disabled={isFieldDisabled("nama")}
               className={getInputClass("nama")}
               placeholder="John Doe"
             />
@@ -225,8 +217,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.nim}
               onChange={handleChange}
               required
-              readOnly={isFieldDisabled("nim")}
-              disabled={isFieldDisabled("nim")}
               className={getInputClass("nim")}
               placeholder="2501XXXXXX"
             />
@@ -242,8 +232,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.no_hp}
               onChange={handleChange}
               required
-              readOnly={isFieldDisabled("no_hp")}
-              disabled={isFieldDisabled("no_hp")}
               className={getInputClass("no_hp")}
               placeholder="08XXXXXXXXXX"
             />
@@ -259,8 +247,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.nama_bisnis}
               onChange={handleChange}
               required
-              readOnly={isFieldDisabled("nama_bisnis")}
-              disabled={isFieldDisabled("nama_bisnis")}
               className={getInputClass("nama_bisnis")}
               placeholder="Nama brand"
             />
@@ -279,8 +265,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.tanggal_berdiri}
               onChange={handleChange}
               required
-              readOnly={isFieldDisabled("tanggal_berdiri")}
-              disabled={isFieldDisabled("tanggal_berdiri")}
               className={getInputClass("tanggal_berdiri")}
               placeholder="1 Januari 2099"
             />
@@ -385,7 +369,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.kategori_bisnis}
               onChange={handleChange}
               required
-              disabled={isFieldDisabled("kategori_bisnis")}
               className={getInputClass("kategori_bisnis")}
             >
               {CATEGORY_OPTIONS.map((category) => (
@@ -406,8 +389,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.nama_produk}
               onChange={handleChange}
               required
-              readOnly={isFieldDisabled("nama_produk")}
-              disabled={isFieldDisabled("nama_produk")}
               className={getInputClass("nama_produk")}
               placeholder="Nama produk"
             />
@@ -423,8 +404,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.harga_produk}
               onChange={handleChange}
               required
-              readOnly={isFieldDisabled("harga_produk")}
-              disabled={isFieldDisabled("harga_produk")}
               className={getInputClass("harga_produk")}
               placeholder="RpXXX.XXX"
             />
@@ -443,8 +422,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.tanggal_diserahkan}
               onChange={handleChange}
               required
-              readOnly={isFieldDisabled("tanggal_diserahkan")}
-              disabled={isFieldDisabled("tanggal_diserahkan")}
               className={getInputClass("tanggal_diserahkan")}
               placeholder="1 Januari 2099"
             />
@@ -462,7 +439,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               value={formData.lokasi_barang}
               onChange={handleChange}
               required
-              readOnly={isFieldDisabled("lokasi_barang")}
               disabled={isFieldDisabled("lokasi_barang")}
               className={getInputClass("lokasi_barang")}
               placeholder="Jakarta"
@@ -486,8 +462,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               onChange={handleChange}
               min="0"
               required
-              readOnly={isFieldDisabled("stok_barang")}
-              disabled={isFieldDisabled("stok_barang")}
               className={getInputClass("stok_barang")}
               placeholder="0"
             />

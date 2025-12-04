@@ -52,6 +52,7 @@ const AddProductPage: React.FC = () => {
           submitLabel="Add Product"
           onCancel={() => router.push("/")}
           lokasiEditable={false}
+          stokEditable={false}
         />
       </div>
     </main>
