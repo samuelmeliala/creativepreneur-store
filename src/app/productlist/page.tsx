@@ -74,6 +74,7 @@ export default function ProductListPage() {
         product.nim,
         product.lokasi_barang,
         product.stok_barang,
+        product.tanggal_diserahkan,
       ];
 
       return haystacks.some((value) =>
