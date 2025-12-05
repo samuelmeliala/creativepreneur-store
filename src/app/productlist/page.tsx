@@ -11,8 +11,6 @@ import {
   ProductSortKey,
 } from "../../lib/data";
 import ProductTable from "../../component/product_table";
-import { Button } from "../../component/ui/button";
-import Link from "next/link";
 
 export default function ProductListPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -114,14 +112,6 @@ export default function ProductListPage() {
                 onChange={setSearchTerm}
                 onClear={() => setSearchTerm("")}
               />
-            </div>
-            <div className="flex gap-2">
-              <Link href="/newproduct">
-                <Button>Add Product</Button>
-              </Link>
-              <Link href="/print">
-                <Button variant="secondary">Print Cards</Button>
-              </Link>
             </div>
           </div>
         </div>
