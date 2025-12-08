@@ -74,23 +74,19 @@ export default function DashboardPage() {
 	};
 
 
-	// Second graph: by first 2 digits of NIM
-	const nimPrefixCounts: Record<string, number> = {};
+	// Group products by year from tanggal_diserahkan
+	const productsByYear: Record<string, Product[]> = {};
 	products.forEach((p) => {
-		const prefix = (p.nim || '').slice(0, 2);
-		if (prefix) nimPrefixCounts[prefix] = (nimPrefixCounts[prefix] || 0) + 1;
+		const date = p.tanggal_diserahkan;
+		if (!date) return;
+		const year = new Date(date).getFullYear();
+		if (!isNaN(year)) {
+			const yearStr = String(year);
+			if (!productsByYear[yearStr]) productsByYear[yearStr] = [];
+			productsByYear[yearStr].push(p);
+		}
 	});
-	const sortedPrefixes = Object.keys(nimPrefixCounts).sort();
-	const nimChartData = {
-		labels: sortedPrefixes.map((prefix) => `B${prefix}`),
-		datasets: [
-			{
-				label: "Number of People",
-				data: sortedPrefixes.map((prefix) => nimPrefixCounts[prefix]),
-				backgroundColor: "#2693f9ff",
-			},
-		],
-	};
+	const availableYears = Object.keys(productsByYear).sort();
 
 	return (
 		<div className="p-6">
@@ -115,25 +111,48 @@ export default function DashboardPage() {
 					/>
 				</div>
 			</div>
-			<div className="bg-white rounded shadow p-4 w-full h-[400px] md:h-[480px] flex flex-col">
-				<h2 className="text-lg font-bold mb-2 text-[#112D4E]">Berdasarkan NIM</h2>
-				<div className="flex-1 w-full">
-					<Bar
-						data={nimChartData}
-						options={{
-							responsive: true,
-							maintainAspectRatio: false,
-							plugins: {
-								legend: { display: false },
-								title: { display: false },
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+				{availableYears.map((year) => {
+					// Aggregate NIM prefixes for this year
+					const nimPrefixCounts: Record<string, number> = {};
+					productsByYear[year].forEach((p) => {
+						const prefix = (p.nim || '').slice(0, 2);
+						if (prefix) nimPrefixCounts[prefix] = (nimPrefixCounts[prefix] || 0) + 1;
+					});
+					const sortedPrefixes = Object.keys(nimPrefixCounts).sort();
+					const nimChartData = {
+						labels: sortedPrefixes.map((prefix) => `B${prefix}`),
+						datasets: [
+							{
+								label: `Number of People (${year})`,
+								data: sortedPrefixes.map((prefix) => nimPrefixCounts[prefix]),
+								backgroundColor: "#2693f9ff",
 							},
-							scales: {
-								x: { title: { display: true, text: "NIM Mahasiswa (BXX)" } },
-								y: { title: { display: true, text: "Number of People" }, beginAtZero: true },
-							},
-						}}
-					/>
-				</div>
+						],
+					};
+					return (
+						<div key={year} className="bg-white rounded shadow p-4 w-full h-[260px] flex flex-col">
+							<h2 className="text-base font-bold mb-2 text-[#112D4E]">NIM Mahasiswa ({year})</h2>
+							<div className="flex-1 w-full">
+								<Bar
+									data={nimChartData}
+									options={{
+										responsive: true,
+										maintainAspectRatio: false,
+										plugins: {
+											legend: { display: false },
+											title: { display: false },
+										},
+										scales: {
+											x: { title: { display: true, text: `NIM Mahasiswa (BXX) - ${year}` } },
+											y: { title: { display: true, text: "Number of People" }, beginAtZero: true },
+										},
+									}}
+								/>
+							</div>
+						</div>
+					);
+				})}
 			</div>
 		</div>
 	);
