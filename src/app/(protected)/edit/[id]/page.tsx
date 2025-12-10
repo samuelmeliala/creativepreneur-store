@@ -3,17 +3,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ref, get, update } from "firebase/database";
-import ProductForm, { ProductFormData } from "../../../component/product_form";
-import { Button } from "../../../component/ui/button";
+import ProductForm, { ProductFormData } from "../../../../component/product_form";
+import { Button } from "../../../../component/ui/button";
 import {
   db,
-} from "../../../lib/firebase";
+} from "../../../../lib/firebase";
 import {
   mapFirebaseProduct,
   FirebaseProduct,
   productToSharedFirebasePayload,
   normalizeProductName,
-} from "../../../lib/data";
+} from "../../../../lib/data";
 
 const PRODUCTS_PATH = "/";
 

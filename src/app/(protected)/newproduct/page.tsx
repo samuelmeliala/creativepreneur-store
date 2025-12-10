@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ref, push } from "firebase/database";
-import ProductForm, { ProductFormData } from "../../component/product_form";
-import { db } from "../../lib/firebase";
-import { productToFirebasePayload } from "../../lib/data";
-import { Button } from "../../component/ui/button";
+import ProductForm, { ProductFormData } from "../../../component/product_form";
+import { db } from "../../../lib/firebase";
+import { productToFirebasePayload } from "../../../lib/data";
+import { Button } from "../../../component/ui/button";
 
 const PRODUCTS_PATH = "/";
 
