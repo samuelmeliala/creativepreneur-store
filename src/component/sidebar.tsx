@@ -10,14 +10,26 @@ import {
   PlusSquare,
   Printer,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "./ui/button";
+import { useSession, signOut } from "next-auth/react";
 
-const NAV_ITEMS = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Product List", href: "/productlist", icon: PackageSearch },
-  { label: "Add Product", href: "/newproduct", icon: PlusSquare },
-  { label: "Print Cards", href: "/print", icon: Printer },
+type Role = "admin" | "mahasiswa";
+
+type NavItem = {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  roles: Role[]; // which roles can see this item
+};
+
+const NAV_ITEMS: NavItem[] = [
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"] },
+  { label: "Product List", href: "/productlist", icon: PackageSearch, roles: ["admin"] },
+  // 👉 mahasiswa can ONLY see this one
+  { label: "Add Product", href: "/newproduct", icon: PlusSquare, roles: ["admin", "mahasiswa"] },
+  { label: "Print Cards", href: "/print", icon: Printer, roles: ["admin"] },
 ];
 
 const NavLink: React.FC<{
@@ -47,8 +59,16 @@ export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
+  const { data: session } = useSession();
+  const role = (session?.user as any)?.role as Role | undefined;
+
   const toggleMobile = () => setIsMobileOpen((prev) => !prev);
   const closeMobile = () => setIsMobileOpen(false);
+
+  // Filter nav items by role
+  const navItemsForRole = role
+    ? NAV_ITEMS.filter((item) => item.roles.includes(role))
+    : []; // if no role yet, show nothing (sidebar usually not used on login anyway)
 
   const brand = (
     <button
@@ -88,13 +108,15 @@ export default function Sidebar() {
 
       {/* Mobile drawer */}
       <div
-        className={`fixed inset-0 z-40 md:hidden ${isMobileOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        className={`fixed inset-0 z-40 md:hidden ${
+          isMobileOpen ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
       >
         <div
           className="absolute inset-0 bg-black/40 backdrop-blur-sm"
           onClick={closeMobile}
         />
-        <aside className="relative h-full w-72 bg-white p-6 shadow-2xl">
+        <aside className="relative flex h-full w-72 flex-col bg-white p-6 shadow-2xl">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-lg font-bold text-[#112D4E]">Creativepreneur</p>
@@ -109,8 +131,9 @@ export default function Sidebar() {
               <X className="h-4 w-4" />
             </Button>
           </div>
-          <nav className="mt-6 space-y-2">
-            {NAV_ITEMS.map((item) => (
+
+          <nav className="mt-6 space-y-2 flex-1">
+            {navItemsForRole.map((item) => (
               <NavLink
                 key={item.href}
                 href={item.href}
@@ -122,6 +145,23 @@ export default function Sidebar() {
               </NavLink>
             ))}
           </nav>
+
+          {/* Mobile footer: user + logout */}
+          {session?.user && (
+            <div className="mt-4 border-t pt-4 text-xs text-gray-500 space-y-2">
+              <p>
+                Logged in as{" "}
+                <span className="font-semibold">{session.user.name}</span> ({role})
+              </p>
+              <Button
+                variant="outline"
+                className="w-full justify-center"
+                onClick={() => signOut({ callbackUrl: "/login" })}
+              >
+                Logout
+              </Button>
+            </div>
+          )}
         </aside>
       </div>
 
@@ -131,26 +171,47 @@ export default function Sidebar() {
           isCollapsed ? "md:w-20" : "md:w-64"
         } hidden h-screen flex-shrink-0 border-r bg-white/80 px-3 pb-6 pt-5 shadow-sm backdrop-blur md:flex md:flex-col md:sticky md:top-0`}
       >
-        <div className="flex items-center justify-between gap-2">{brand}</div>
-        <nav className="mt-8 flex-1 space-y-1">
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.href}
-              href={item.href}
-              isActive={pathname?.startsWith(item.href) ?? false}
-              isCompact={isCollapsed}
-            >
-              <item.icon className="h-5 w-5 flex-shrink-0 text-[#3F72AF]" />
-              <span
-                className={`whitespace-nowrap overflow-hidden text-sm font-semibold transition-all ${
-                  isCollapsed ? "w-0 opacity-0" : "opacity-100"
-                }`}
+        <div className="flex h-full flex-col">
+          <div>
+            <div className="flex items-center justify-between gap-2">{brand}</div>
+            <nav className="mt-8 flex-1 space-y-1">
+              {navItemsForRole.map((item) => (
+                <NavLink
+                  key={item.href}
+                  href={item.href}
+                  isActive={pathname?.startsWith(item.href) ?? false}
+                  isCompact={isCollapsed}
+                >
+                  <item.icon className="h-5 w-5 flex-shrink-0 text-[#3F72AF]" />
+                  <span
+                    className={`whitespace-nowrap overflow-hidden text-sm font-semibold transition-all ${
+                      isCollapsed ? "w-0 opacity-0" : "opacity-100"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </NavLink>
+              ))}
+            </nav>
+          </div>
+
+          {/* Desktop footer: user + logout */}
+          {session?.user && (
+            <div className="mt-4 border-t pt-4 text-xs text-gray-500 space-y-2">
+              <p>
+                Logged in as{" "}
+                <span className="font-semibold">{session.user.name}</span> ({role})
+              </p>
+              <Button
+                variant="outline"
+                className="w-full justify-center"
+                onClick={() => signOut({ callbackUrl: "/login" })}
               >
-                {item.label}
-              </span>
-            </NavLink>
-          ))}
-        </nav>
+                Logout
+              </Button>
+            </div>
+          )}
+        </div>
       </aside>
     </>
   );

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Open_Sans } from "next/font/google";
+// import { Open_Sans } from "next/font/google";
 import "./globals.css"; // Assuming you have a global CSS file
-import Sidebar from "../component/sidebar";
+import AuthProvider from "../component/AuthProvider";
 
-const openSans = Open_Sans({ subsets: ["latin"] });
+// const openSans = Open_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Creativepreneur Store",
@@ -12,21 +12,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body className={openSans.className}>
-        <div className="min-h-screen flex bg-[#F7FAFC]">
-          <div className="print:hidden">
-            <Sidebar />
-          </div>
-          <main className="flex-1 print:ml-0">
-            {/* The 'children' prop is where your page.tsx content will be rendered */}
-            {children}
-          </main>
-        </div>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

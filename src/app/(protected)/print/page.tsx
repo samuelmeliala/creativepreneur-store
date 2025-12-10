@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { ref, onValue } from "firebase/database";
-import { db } from "../../lib/firebase";
-import { Product, Categories } from "../../lib/data";
-import ProductPrintList from "../../component/ProductPrintList";
+import { db } from "../../../lib/firebase";
+import { Product, Categories } from "../../../lib/data";
+import ProductPrintList from "../../../component/ProductPrintList";
 
 const categoryList: Categories[] = [
   "Advertising, Printing, & Media",
