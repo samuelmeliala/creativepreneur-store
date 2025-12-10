@@ -29,7 +29,7 @@ export default function DashboardPage() {
 				const arrayData: any[] = Array.isArray(data)
 					? (data.filter(Boolean) as any[])
 					: (Object.entries(data).map(([id, v]) => mapFirebaseProduct(id, v)));
-				// If already mapped, skip mapping again
+
 				setProducts(
 					arrayData.length && typeof arrayData[0].id === "string"
 						? (arrayData as Product[])
@@ -42,26 +42,78 @@ export default function DashboardPage() {
 		return () => unsubscribe();
 	}, []);
 
+	// ==========================
+	// SUPER DATE PARSER
+	// ==========================
+	const monthMap: Record<string, number> = {
+		january: 0, januari: 0,
+		february: 1, februari: 1,
+		march: 2, maret: 2,
+		april: 3,
+		may: 4, mei: 4,
+		june: 5, juni: 5,
+		july: 6, juli: 6,
+		august: 7, agustus: 7,
+		september: 8,
+		october: 9, oktober: 9,
+		november: 10,
+		december: 11, desember: 11,
+	};
+
+	function parseCustomDate(dateStr: string): Date {
+		if (!dateStr) return new Date(NaN);
+
+		// Hilangkan koma (contoh: "28 Mei, 2025")
+		dateStr = dateStr.replace(/,/g, " ");
+
+		// Hilangkan jam jika ada (contoh: "28 May 2025 10:20")
+		dateStr = dateStr.split(" ")[0] + " " +
+				  (dateStr.split(" ")[1] || "") + " " +
+				  (dateStr.split(" ")[2] || "");
+
+		// Normalize separator seperti "-", "/", "  "
+		dateStr = dateStr.replace(/-/g, " ").replace(/\//g, " ").replace(/\s+/g, " ").trim();
+
+		const parts = dateStr.split(" ");
+		if (parts.length < 3) return new Date(NaN);
+
+		const day = parseInt(parts[0], 10);
+		const monthName = parts[1].toLowerCase();
+		const year = parseInt(parts[2], 10);
+
+		const month = monthMap[monthName];
+
+		if (isNaN(day) || isNaN(year) || month === undefined) return new Date(NaN);
+
+		return new Date(year, month, day);
+	}
+
+	// ==========================
 	// Aggregate by tanggal_diserahkan
+	// ==========================
 	const dateCounts: Record<string, number> = {};
 	products.forEach((p) => {
 		const date = p.tanggal_diserahkan || "(none)";
 		dateCounts[date] = (dateCounts[date] || 0) + 1;
 	});
-	// Format dates for x-axis labels (e.g., YYYY-MM-DD or locale string)
+
+	// ==========================
+	// SORTING BY REAL DATE
+	// ==========================
 	const sortedDates = Object.keys(dateCounts)
 		.filter((d) => d && d !== "(none)")
-		.sort((a, b) => new Date(b).getTime() - new Date(a).getTime()); // Newest first
+		.sort((a, b) => parseCustomDate(b).getTime() - parseCustomDate(a).getTime());
+
 	const formattedLabels = sortedDates.map((d) => {
-		const dateObj = new Date(d);
+		const dateObj = parseCustomDate(d);
 		if (isNaN(dateObj.getTime())) return d;
-		// Format: day month year (e.g., 17 November 2025)
-		return dateObj.toLocaleDateString('en-GB', {
-			day: '2-digit',
-			month: 'long',
-			year: 'numeric',
+		return dateObj.toLocaleDateString("en-GB", {
+			day: "2-digit",
+			month: "long",
+			year: "numeric",
 		});
 	});
+
 	const chartData = {
 		labels: formattedLabels,
 		datasets: [
@@ -73,24 +125,29 @@ export default function DashboardPage() {
 		],
 	};
 
-
-	// Group products by year from tanggal_diserahkan
+	// ==========================
+	// Group by year
+	// ==========================
 	const productsByYear: Record<string, Product[]> = {};
 	products.forEach((p) => {
 		const date = p.tanggal_diserahkan;
 		if (!date) return;
-		const year = new Date(date).getFullYear();
+
+		const year = parseCustomDate(date).getFullYear();
 		if (!isNaN(year)) {
 			const yearStr = String(year);
 			if (!productsByYear[yearStr]) productsByYear[yearStr] = [];
 			productsByYear[yearStr].push(p);
 		}
 	});
+
 	const availableYears = Object.keys(productsByYear).sort();
 
 	return (
 		<div className="p-6">
 			<h1 className="text-2xl font-semibold text-[#112D4E] mb-4">Dashboard</h1>
+
+			{/* Chart 1 */}
 			<div className="bg-white rounded shadow p-4 w-full h-[480px] md:h-[600px] flex flex-col mb-8">
 				<h2 className="text-lg font-bold mb-2 text-[#112D4E]">Per Tanggal Diserahkan</h2>
 				<div className="flex-1 w-full">
@@ -99,10 +156,7 @@ export default function DashboardPage() {
 						options={{
 							responsive: true,
 							maintainAspectRatio: false,
-							plugins: {
-								legend: { display: false },
-								title: { display: false },
-							},
+							plugins: { legend: { display: false }, title: { display: false } },
 							scales: {
 								x: { title: { display: true, text: "Tanggal Diserahkan" } },
 								y: { title: { display: true, text: "Number of People" }, beginAtZero: true },
@@ -111,15 +165,19 @@ export default function DashboardPage() {
 					/>
 				</div>
 			</div>
+
+			{/* Chart 2 */}
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
 				{availableYears.map((year) => {
-					// Aggregate NIM prefixes for this year
 					const nimPrefixCounts: Record<string, number> = {};
+
 					productsByYear[year].forEach((p) => {
-						const prefix = (p.nim || '').slice(0, 2);
+						const prefix = (p.nim || "").slice(0, 2);
 						if (prefix) nimPrefixCounts[prefix] = (nimPrefixCounts[prefix] || 0) + 1;
 					});
+
 					const sortedPrefixes = Object.keys(nimPrefixCounts).sort();
+
 					const nimChartData = {
 						labels: sortedPrefixes.map((prefix) => `B${prefix}`),
 						datasets: [
@@ -130,6 +188,7 @@ export default function DashboardPage() {
 							},
 						],
 					};
+
 					return (
 						<div key={year} className="bg-white rounded shadow p-4 w-full h-[260px] flex flex-col">
 							<h2 className="text-base font-bold mb-2 text-[#112D4E]">NIM Mahasiswa ({year})</h2>
@@ -139,10 +198,7 @@ export default function DashboardPage() {
 									options={{
 										responsive: true,
 										maintainAspectRatio: false,
-										plugins: {
-											legend: { display: false },
-											title: { display: false },
-										},
+										plugins: { legend: { display: false }, title: { display: false } },
 										scales: {
 											x: { title: { display: true, text: `NIM Mahasiswa (BXX) - ${year}` } },
 											y: { title: { display: true, text: "Number of People" }, beginAtZero: true },
