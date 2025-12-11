@@ -3,8 +3,8 @@
 
 import React, { useEffect, useState } from "react";
 import { ref, onValue } from "firebase/database";
-import { db } from "../../lib/firebase";
-import { mapFirebaseProduct, Product } from "../../lib/data";
+import { db } from "../../../lib/firebase";
+import { mapFirebaseProduct, Product } from "../../../lib/data";
 import { Bar } from "react-chartjs-2";
 import {
 	Chart as ChartJS,

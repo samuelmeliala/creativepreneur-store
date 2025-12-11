@@ -2,15 +2,15 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { ref, onValue } from "firebase/database";
-import { db } from "../../lib/firebase";
-import SearchInput from "../../component/search";
+import { db } from "../../../lib/firebase";
+import SearchInput from "../../../component/search";
 import {
   Product,
   FirebaseProduct,
   mapFirebaseProduct,
   ProductSortKey,
-} from "../../lib/data";
-import ProductTable from "../../component/product_table";
+} from "../../../lib/data";
+import ProductTable from "../../../component/product_table";
 
 export default function ProductListPage() {
   const [products, setProducts] = useState<Product[]>([]);
