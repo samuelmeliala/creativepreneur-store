@@ -103,12 +103,6 @@ export default function PrintProductsPage() {
             style={{ minWidth: 0 }}
           />
           <div className="flex gap-2">
-            <a
-              href="/"
-              className="px-4 py-2 bg-white text-[#112D4E] font-semibold rounded hover:bg-gray-200 transition-colors shadow"
-            >
-              Back
-            </a>
             <button
               onClick={handlePrint}
               className="px-4 py-2 bg-[#112D4E] text-white font-semibold rounded hover:bg-blue-900 transition-colors shadow"
