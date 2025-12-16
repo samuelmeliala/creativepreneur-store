@@ -36,11 +36,23 @@ const ProductPrintList: React.FC<ProductPrintListProps> = ({ products }) => {
     <div className="bg-[#DBE2EF] p-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 print:grid-cols-3 print:grid-rows-3 print:gap-2 print:mx-auto print:w-full print:max-w-[1200px]">
         {uniqueGroups.map((group, idx) => (
-          <ProductPrintCard key={idx} product={group.primary} team={group.team} />
+          <div key={idx} onClick={() => setSelectedProduct(group.primary)} style={{ cursor: 'pointer' }}>
+            <ProductPrintCard product={group.primary} team={group.team} />
+          </div>
         ))}
       </div>
 
-
+      {selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#DBE2EF]" onClick={() => setSelectedProduct(null)}>
+          <div className="bg-white rounded-lg shadow-lg p-6 relative" style={{ width: '560px', height: 'auto' }} onClick={e => e.stopPropagation()}>
+            {/* When previewing larger, find its group to pass team members and large flag */}
+            <ProductPrintCard product={selectedProduct} team={(() => {
+              const key = `${selectedProduct.nama_bisnis}|${selectedProduct.kategori_bisnis}|${selectedProduct.nama_produk}`;
+              return groupsMap.get(key)?.team ?? [{ nama: selectedProduct.nama, nim: selectedProduct.nim }];
+            })()} large />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
