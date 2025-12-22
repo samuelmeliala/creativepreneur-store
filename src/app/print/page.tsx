@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { ref, onValue } from "firebase/database";
-import { db } from "../../../lib/firebase";
-import { Product, Categories } from "../../../lib/data";
-import ProductPrintList from "../../../component/ProductPrintList";
+import { db } from "../../lib/firebase";
+import { Product, Categories } from "../../lib/data";
+import ProductPrintList from "../../component/ProductPrintList";
 
 const categoryList: Categories[] = [
   "Advertising, Printing, & Media",
@@ -102,7 +102,7 @@ export default function PrintProductsPage() {
             className="w-full sm:w-96 px-4 py-2 rounded bg-white text-[#112D4E] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 shadow"
             style={{ minWidth: 0 }}
           />
-          <div className="flex gap-2">
+          <div className="flex gap-2">          
             <button
               onClick={handlePrint}
               className="px-4 py-2 bg-[#112D4E] text-white font-semibold rounded hover:bg-blue-900 transition-colors shadow"
