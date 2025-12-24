@@ -25,7 +25,7 @@ export default function PrintByNamaBisnisPage() {
         item["Nama Bisnis"] && normalized(item["Nama Bisnis"]) === normalized(namaBisnis)
       );
       if (group.length > 0) {
-        // Use the first as the main product
+        // Use the first as the main product.
         const main = group[0];
         setProduct({
           nama: main["Nama"],
