@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ref, onValue } from "firebase/database";
-import { db } from "../../../../lib/firebase";
-import { Product } from "../../../../lib/data";
+import { db } from "../../../lib/firebase";
+import { Product } from "../../../lib/data";
 
 export default function PrintByNamaBisnisPage() {
   const params = useParams();
@@ -25,7 +25,7 @@ export default function PrintByNamaBisnisPage() {
         item["Nama Bisnis"] && normalized(item["Nama Bisnis"]) === normalized(namaBisnis)
       );
       if (group.length > 0) {
-        // Use the first as the main product
+        // Use the first as the main product.
         const main = group[0];
         setProduct({
           nama: main["Nama"],
