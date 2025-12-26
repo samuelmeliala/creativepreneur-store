@@ -21,7 +21,7 @@ export default function LoginPage() {
       redirect: false,
       username,
       password,
-      callbackUrl: "/dashboard", // admin → /dashboard, mahasiswa will be redirected by middleware
+      callbackUrl: "/", // ✅ root decides landing by role (admin->/dashboard, mahasiswa->/newproduct)
     });
 
     setLoading(false);
@@ -32,7 +32,7 @@ export default function LoginPage() {
     }
 
     if (res.ok && res.url) {
-      router.push(res.url);
+      router.push(res.url); // usually "/"
     }
   }
 
@@ -42,32 +42,28 @@ export default function LoginPage() {
         onSubmit={handleSubmit}
         className="w-full max-w-sm bg-white shadow-md rounded px-8 pt-6 pb-8"
       >
-        <h1 className="text-xl font-semibold mb-4 text-center">
+        <h1 className="text-xl font-semibold mb-4 text-center text-black">
           Login Dashboard
         </h1>
 
-        {error && (
-          <p className="mb-3 text-sm text-red-600">
-            {error}
-          </p>
-        )}
+        {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
 
-        <label className="block mb-2 text-sm font-medium text-gray-700">
+        <label className="block mb-2 text-sm font-medium text-black">
           Username
         </label>
         <input
-          className="w-full mb-4 border rounded px-3 py-2 text-sm"
+          className="w-full mb-4 border rounded px-3 py-2 text-sm text-black"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           autoComplete="username"
         />
 
-        <label className="block mb-2 text-sm font-medium text-gray-700">
+        <label className="block mb-2 text-sm font-medium text-black">
           Password
         </label>
         <input
           type="password"
-          className="w-full mb-6 border rounded px-3 py-2 text-sm"
+          className="w-full mb-6 border rounded px-3 py-2 text-sm text-black"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
