@@ -1,52 +1,42 @@
+// middleware.ts
+import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
 
-const PUBLIC_PATHS = ["/login", "/api/auth"];
+export default withAuth(
+  function middleware(req) {
+    const { pathname } = req.nextUrl;
+    const token = req.nextauth.token;
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+    const role = token?.role as "admin" | "mahasiswa" | undefined;
 
-  // Allow public paths and static assets
-  if (
-    PUBLIC_PATHS.some((p) => pathname.startsWith(p)) ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon") ||
-    pathname.startsWith("/assets")
-  ) {
-    return NextResponse.next();
-  }
+    // mahasiswa can ONLY access /newproduct
+    if (role === "mahasiswa") {
+      const allowedForMahasiswa = ["/newproduct"];
 
-  const token = await getToken({
-    req,
-    secret: process.env.NEXTAUTH_SECRET,
-  });
+      const isAllowed = allowedForMahasiswa.some((p) =>
+        pathname.startsWith(p)
+      );
 
-  // Not logged in → redirect to /login
-  if (!token) {
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("callbackUrl", req.url);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  const role = token.role as "admin" | "mahasiswa" | undefined;
-
-  // mahasiswa can ONLY access /addproduct
-  if (role === "mahasiswa") {
-    const allowedForMahasiswa = ["/addproduct"];
-    const isAllowed = allowedForMahasiswa.some((p) =>
-      pathname.startsWith(p)
-    );
-
-    if (!isAllowed) {
-      return NextResponse.redirect(new URL("/addproduct", req.url));
+      if (!isAllowed) {
+        // redirect mahasiswa away from any other page (dashboard, productlist, print, etc.)
+        return NextResponse.redirect(new URL("/newproduct", req.url));
+      }
     }
+
+    // admin can access everything
+    return NextResponse.next();
+  },
+  {
+    callbacks: {
+      // If there's no token, user is not logged in → NextAuth will send them to /login (since you set pages.signIn = "/login")
+      authorized: ({ token }) => !!token,
+    },
   }
+);
 
-  // admin can access everything
-  return NextResponse.next();
-}
-
+// Apply middleware to all routes except static, login, and auth API
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|login|api/auth).*)",
+  ],
 };
