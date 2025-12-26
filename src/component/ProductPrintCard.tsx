@@ -3,18 +3,17 @@
 import React, { useEffect, useState } from "react";
 import QRCodeLib from "qrcode";
 import { Product } from "../lib/data";
+import { QR_DOMAIN } from "../lib/qrconfig";
 
 interface ProductPrintCardProps {
   product: Product;
-  /** when true, render a larger preview suitable for scanning */
-  large?: boolean;
   team?: { nama: string; nim: string }[];
 }
 
-
 // Standard business card size: 3.5 x 2 inches (about 336 x 192 px at 96dpi)
-const ProductPrintCard: React.FC<ProductPrintCardProps> = ({ product, large = false, team }) => {
+const ProductPrintCard: React.FC<ProductPrintCardProps> = ({ product, team }) => {
   const [qrSrc, setQrSrc] = useState<string | null>(null);
+  const qrUrl = `${QR_DOMAIN}/print/${normalizeNamaBisnis(product.nama_bisnis)}`;
 
   React.useEffect(() => {
     let mounted = true;
@@ -50,8 +49,8 @@ const ProductPrintCard: React.FC<ProductPrintCardProps> = ({ product, large = fa
 
     const textPayload = [...baseLines, ...teamLines].join("\n");
 
-    const pixelSize = large ? 400 : 200;
-    QRCodeLib.toDataURL(textPayload, { margin: 1, width: pixelSize })
+    const pixelSize = 200;
+    QRCodeLib.toDataURL(qrUrl, { margin: 1, width: pixelSize })
       .then((url) => {
         if (mounted) setQrSrc(url);
       })
@@ -60,56 +59,63 @@ const ProductPrintCard: React.FC<ProductPrintCardProps> = ({ product, large = fa
       });
 
     return () => { mounted = false; };
-  }, [product, large]);
+  }, [product, qrUrl]);
 
   // sizing
-  const cardWidth = large ? '500px' : '280px';
-  const cardHeight = large ? '320px' : '170px';
-  const padding = large ? '24px' : '12px';
-  const fontSize = large ? '16px' : '10px';
-  const qrDisplaySize = large ? 220 : 90;
+  const cardWidth = '280px';
+  const cardHeight = '170px';
+  const padding = '12px';
+  const fontSize = '10px';
+  const qrDisplaySize = 90;
 
   return (
-  <div
-    className={`print-card border border-gray-400 rounded shadow bg-white ${large ? '' : 'm-2'} flex flex-col justify-between items-start print:border-black print:border-2`}
-    style={{
-      width: cardWidth,
-      height: cardHeight,
-      padding: padding,
-      fontSize: fontSize,
-      boxSizing: 'border-box',
-      position: 'relative',
-      breakInside: 'avoid',
-      pageBreakInside: 'avoid',
-    }}
-  >
-    <div className="w-full flex flex-row justify-between items-start">
-      <div className="flex-1 min-w-0 flex flex-col justify-between">
-        <div>
-          <div className={`font-bold ${large ? 'text-xl' : 'text-sm'} mb-1 text-blue-900 truncate w-full`} title={product.nama_bisnis}>
-            {product.nama_bisnis}
-          </div>
-          <div className={`${large ? 'text-base' : 'text-[11px]'} text-gray-700 mb-1 font-semibold`}>
-            {product.kategori_bisnis}
-          </div>
-          <div className={`${large ? 'text-lg' : 'text-xs'} text-gray-900 font-medium break-words`}>
-            {product.nama_produk}
+    <div
+      className={`print-card border border-gray-400 rounded shadow bg-white m-2 flex flex-col justify-between items-start print:border-black print:border-2`}
+      style={{
+        width: cardWidth,
+        height: cardHeight,
+        padding: padding,
+        fontSize: fontSize,
+        boxSizing: 'border-box',
+        position: 'relative',
+        breakInside: 'avoid',
+        pageBreakInside: 'avoid',
+        cursor: 'pointer',
+      }}
+      onClick={() => window.location.href = qrUrl}
+      role="button"
+      tabIndex={0}
+      // Removed interactive props to disable pop out/bigger card on click
+    >
+      <div className="w-full flex flex-row justify-between items-start">
+        <div className="flex-1 min-w-0 flex flex-col justify-between">
+          <div>
+            <div className={`font-bold text-sm mb-1 text-blue-900 truncate w-full`} title={product.nama_bisnis}>
+              {product.nama_bisnis}
+            </div>
+            <div className={`text-[11px] text-gray-700 mb-1 font-semibold`}>
+              {product.kategori_bisnis}
+            </div>
+            <div className={`text-xs text-gray-900 font-medium break-words`}>
+              {product.nama_produk}
+            </div>
           </div>
         </div>
+        {/* QR code (always show, but not too large) */}
+        <div className="ml-2 flex-shrink-0 border border-dashed border-gray-300 rounded flex items-center justify-center bg-white" style={{ width: qrDisplaySize, height: qrDisplaySize }}>
+          {qrSrc ? (
+            <img src={qrSrc} alt="QR code" width={qrDisplaySize} height={qrDisplaySize} className="object-contain" />
+          ) : (
+            <div className="text-xs text-gray-400">QR</div>
+          )}
+        </div>
       </div>
-      {/* QR code (always show, but not too large) */}
-      <div className="ml-2 flex-shrink-0 border border-dashed border-gray-300 rounded flex items-center justify-center bg-white" style={{ width: qrDisplaySize, height: qrDisplaySize }}>
-        {qrSrc ? (
-          <img src={qrSrc} alt="QR code" width={qrDisplaySize} height={qrDisplaySize} className="object-contain" />
-        ) : (
-          <div className="text-xs text-gray-400">QR</div>
-        )}
-      </div>
+      {/* Preview watermark for screen only */}
+      <div className="absolute top-2 right-2 text-[10px] text-gray-400 print:hidden"></div>
     </div>
-    {/* Preview watermark for screen only */}
-    <div className="absolute top-2 right-2 text-[10px] text-gray-400 print:hidden"></div>
-  </div>
   );
 };
+
+const normalizeNamaBisnis = (nama: string) => nama.toLowerCase().replace(/\s+/g, "");
 
 export default ProductPrintCard;
