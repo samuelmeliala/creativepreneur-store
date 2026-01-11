@@ -6,5 +6,5 @@ export const QR_DOMAIN = (() => {
   if (typeof process !== "undefined" && process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
-  return "https://your-default-domain.com"; // Change this to your actual production domain if needed
+  return "https://creativepreneur-store-lake.vercel.app"; // Change this to your actual production domain if needed
 })();
