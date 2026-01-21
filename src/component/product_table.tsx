@@ -64,14 +64,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
   };
 
   const headers: { key: ProductSortKey; label: string }[] = [
+    { key: "nama_produk", label: "Foto" },
     { key: "nama_produk", label: "Nama Produk" },
     { key: "nomer_induk_barang", label: "Nomer Induk Barang" },
     { key: "lokasi_barang", label: "Lokasi Barang" },
     { key: "stok_barang", label: "Stok Barang" },
-    { key: "nama", label: "Nama Mahasiswa" },
-    { key: "nim", label: "NIM" },
-    { key: "kategori_bisnis", label: "Kategori" },
-    { key: "harga_produk", label: "Harga Produk" },
   ];
 
   const groupedProducts = useMemo<GroupedProduct[]>(() => {
@@ -110,7 +107,8 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
       <table className="w-full text-left">
         <thead className="bg-gray-50 border-b border-gray-200">
           <tr>
-            {headers.map((header) => (
+            <th className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase tracking-wider">Foto</th>
+            {headers.slice(1).map((header) => (
               <th
                 key={header.key}
                 className="px-6 py-3 text-sm font-semibold text-gray-600 uppercase tracking-wider cursor-pointer select-none"
@@ -131,25 +129,24 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
             groupedProducts.map((group) => {
               const { primary, items } = group;
               return (
-                <tr key={group.groupId} className="hover:bg-gray-50 transition-colors align-top">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{primary.nama_produk}</td>
+                <tr key={group.groupId} className="hover:bg-gray-50 transition-colors align-middle">
+                  <td className="px-6 py-4">
+                    {primary.foto_produk ? (
+                      <img
+                        src={getDriveImageUrl(primary.foto_produk)}
+                        alt={primary.nama_produk}
+                        className="w-24 h-24 object-cover rounded"
+                      />
+                    ) : (
+                      <div className="w-24 h-24 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">
+                        No Image
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-base font-medium text-black">{primary.nama_produk}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{primary.nomer_induk_barang || "-"}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{primary.lokasi_barang || "-"}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{primary.stok_barang || "-"}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    <div className="space-y-2">{items.map((item) => <div key={item.id}>{item.nama}</div>)}</div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    <div className="space-y-2">{items.map((item) => <div key={item.id}>{item.nim}</div>)}</div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    <span
-                      className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${categoryColors[primary.kategori_bisnis]}`}
-                    >
-                      {primary.kategori_bisnis}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{primary.harga_produk}</td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-3">
                       <Button variant="table" onClick={() => setSelectedGroup(group)}>
@@ -165,7 +162,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
             })
           ) : (
             <tr>
-              <td colSpan={headers.length + 1} className="text-center py-10 text-gray-500">
+              <td colSpan={headers.length + 2} className="text-center py-10 text-gray-500">
                 No products found. Try adjusting your filters.
               </td>
             </tr>
@@ -176,7 +173,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
       {/* Modal Detail */}
       {selectedGroup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
-          <div className="bg-white p-6 rounded-lg w-96 shadow-lg">
+          <div className="bg-white p-6 rounded-lg w-96 shadow-lg max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-bold mb-3 text-gray-900">
               {selectedGroup.primary.nama_produk}
             </h2>
