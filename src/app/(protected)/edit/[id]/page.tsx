@@ -121,12 +121,12 @@ const EditProductPage: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8">
-      <div className="mx-auto max-w-4xl space-y-6">
+    <main className="min-h-screen bg-[#DBE2EF] font-sans p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-full space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Edit Product</h1>
-            <p className="text-gray-600">Update the fields below to modify the product.</p>
+            <h1 className="text-3xl font-bold text-[#112D4E]">Edit Product</h1>
+            <p className="text-sm text-[#112D4E] mt-1">Update the fields below to modify the product.</p>
           </div>
           <Button type="button" variant="secondary" onClick={() => router.push("/")}>
             Back to Dashboard
