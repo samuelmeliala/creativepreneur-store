@@ -145,7 +145,7 @@ export default function DashboardPage() {
 
 	return (
 		<div className="p-6">
-			<h1 className="text-2xl font-semibold text-[#112D4E] mb-4">Dashboard</h1>
+			<h1 className="text-2xl font-semibold text-[#112D4E] mb-4">Creativepreneur Store Dashboard</h1>
 
 			{/* Chart 1 */}
 			<div className="bg-white rounded shadow p-4 w-full h-[480px] md:h-[600px] flex flex-col mb-8">
