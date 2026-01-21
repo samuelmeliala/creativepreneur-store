@@ -29,7 +29,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Product List", href: "/productlist", icon: PackageSearch, roles: ["admin"] },
   // 👉 mahasiswa can ONLY see this one
   { label: "Add Product", href: "/newproduct", icon: PlusSquare, roles: ["admin", "mahasiswa"] },
-  { label: "Print Cards", href: "/print", icon: Printer, roles: ["admin"] },
+  { label: "Product Cards", href: "/print", icon: Printer, roles: ["admin"] },
 ];
 
 const NavLink: React.FC<{

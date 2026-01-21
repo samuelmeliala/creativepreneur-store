@@ -91,7 +91,7 @@ export default function PrintProductsPage() {
   return (
     <div className="min-h-screen bg-[#DBE2EF] p-4">
       <div className="bg-[#DBE2EF] p-0">
-        <h1 className="text-3xl font-bold mb-1 text-[#112D4E] print:hidden">Creativepreneur Store Print</h1>
+        <h1 className="text-3xl font-bold mb-1 text-[#112D4E] print:hidden">Product Cards</h1>
         <p className="text-[#112D4E] mb-4 print:hidden">Print QR Cards for Products.</p>
         <div className="bg-[#3F72AF] rounded-xl px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 shadow print:hidden">
           <input
