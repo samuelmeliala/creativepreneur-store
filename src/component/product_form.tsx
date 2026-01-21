@@ -91,6 +91,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
     return false;
   };
 
+  const isFieldRequired = (field: keyof ProductFormData) => {
+    // All fields are required except lokasi_barang and stok_barang
+    return field !== "lokasi_barang" && field !== "stok_barang";
+  };
+
+  const renderLabel = (label: string, field: keyof ProductFormData) => {
+    const required = isFieldRequired(field);
+    return (
+      <label className="block text-sm font-medium text-gray-700">
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+    );
+  };
+
   const inputBaseClass =
     "mt-1 w-full rounded-md border px-3 py-2 text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-500";
 
@@ -190,9 +205,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
-            <label htmlFor="nama" className="block text-sm font-medium text-gray-700">
-              Nama Mahasiswa
-            </label>
+            {renderLabel("Nama Mahasiswa", "nama")}
             <input
               id="nama"
               name="nama"
@@ -208,9 +221,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </div>
 
           <div>
-            <label htmlFor="nim" className="block text-sm font-medium text-gray-700">
-              NIM
-            </label>
+            {renderLabel("NIM", "nim")}
             <input
               id="nim"
               name="nim"
@@ -223,9 +234,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </div>
 
           <div>
-            <label htmlFor="no_hp" className="block text-sm font-medium text-gray-700">
-              Nomor Telepon
-            </label>
+            {renderLabel("Nomor Telepon", "no_hp")}
             <input
               id="no_hp"
               name="no_hp"
@@ -238,9 +247,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </div>
 
           <div>
-            <label htmlFor="nama_bisnis" className="block text-sm font-medium text-gray-700">
-              Nama Bisnis
-            </label>
+            {renderLabel("Nama Bisnis", "nama_bisnis")}
             <input
               id="nama_bisnis"
               name="nama_bisnis"
@@ -253,12 +260,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </div>
 
           <div>
-            <label
-              htmlFor="tanggal_berdiri"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Tanggal Berdiri
-            </label>
+            {renderLabel("Tanggal Berdiri", "tanggal_berdiri")}
             <input
               id="tanggal_berdiri"
               name="tanggal_berdiri"
@@ -271,9 +273,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </div>
           
           <div>
-            <label htmlFor="foto_produk" className="block text-sm font-medium text-gray-700">
-              Foto Produk
-            </label>
+            {renderLabel("Foto Produk", "foto_produk")}
             <input
               id="foto_produk"
               name="foto_produk"
@@ -357,12 +357,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
         <div className="space-y-4">
           <div>
-            <label
-              htmlFor="kategori_bisnis"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Kategori Bisnis
-            </label>
+            {renderLabel("Kategori Bisnis", "kategori_bisnis")}
             <select
               id="kategori_bisnis"
               name="kategori_bisnis"
@@ -380,9 +375,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </div>
 
           <div>
-            <label htmlFor="nama_produk" className="block text-sm font-medium text-gray-700">
-              Nama Produk
-            </label>
+            {renderLabel("Nama Produk", "nama_produk")}
             <input
               id="nama_produk"
               name="nama_produk"
@@ -395,9 +388,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </div>
 
           <div>
-            <label htmlFor="harga_produk" className="block text-sm font-medium text-gray-700">
-              Harga Produk
-            </label>
+            {renderLabel("Harga Produk", "harga_produk")}
             <input
               id="harga_produk"
               name="harga_produk"
@@ -410,12 +401,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </div>
 
           <div>
-            <label
-              htmlFor="tanggal_diserahkan"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Tanggal Diserahkan
-            </label>
+            {renderLabel("Tanggal Diserahkan", "tanggal_diserahkan")}
             <input
               id="tanggal_diserahkan"
               name="tanggal_diserahkan"
@@ -427,12 +413,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
             />
           </div>
 
-          
-
           <div>
-            <label htmlFor="lokasi_barang" className="block text-sm font-medium text-gray-700">
-              Lokasi
-            </label>
+            {renderLabel("Lokasi Barang", "lokasi_barang")}
             <input
               id="lokasi_barang"
               name="lokasi_barang"
@@ -451,9 +433,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </div>
 
           <div>
-            <label htmlFor="stok_barang" className="block text-sm font-medium text-gray-700">
-              Stok Barang
-            </label>
+            {renderLabel("Stok Barang", "stok_barang")}
             <input
               id="stok_barang"
               name="stok_barang"
