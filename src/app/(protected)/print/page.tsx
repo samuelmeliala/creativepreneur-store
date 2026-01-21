@@ -113,6 +113,11 @@ export default function PrintProductsPage() {
         </div>
       </div>
       <ProductPrintList products={filteredProducts} />
+    <footer className="text-center mt-8 text-gray-500 text-sm">
+      <div className="mt-2 text-xs text-gray-500">
+        Creativepreneurship Department Binus Bandung © 2025
+      </div>
+    </footer>
     </div>
   );
 }

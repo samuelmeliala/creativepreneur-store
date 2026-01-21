@@ -163,6 +163,9 @@ export default function Sidebar() {
               </Button>
             </div>
           )}
+          <div className="mt-6 text-center text-xs text-gray-500">
+            Creativepreneurship Department Binus Bandung © 2025
+          </div>
         </aside>
       </div>
 
@@ -213,6 +216,10 @@ export default function Sidebar() {
               </Button>
             </div>
           )}
+          <div className="mt-6 text-center text-xs text-gray-500">
+            Creativepreneurship Department Binus Bandung © 2025
+
+          </div>
         </div>
       </aside>
     </>
