@@ -15,7 +15,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <div className="min-h-screen flex flex-col">
+            <div className="flex-1 flex flex-col">{children}</div>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );
