@@ -2,11 +2,16 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ref, push } from "firebase/database";
+import { ref, push, get } from "firebase/database";
 import ProductForm, { ProductFormData } from "../../../component/product_form";
 import { db } from "../../../lib/firebase";
-import { productToFirebasePayload } from "../../../lib/data";
-import { Button } from "../../../component/ui/button";
+import {
+  FirebaseProduct,
+  mapFirebaseProduct,
+  Product,
+  productToFirebasePayload,
+} from "../../../lib/data";
+import { generateNomerIndukBarang } from "../../../lib/nomerIndukBarang";
 
 const PRODUCTS_PATH = "/";
 
@@ -21,7 +26,38 @@ const AddProductPage: React.FC = () => {
 
     try {
       const productsRef = ref(db, PRODUCTS_PATH);
-      await push(productsRef, productToFirebasePayload(product));
+      let existingProducts: Product[] = [];
+      const snapshot = await get(productsRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        if (Array.isArray(data)) {
+          existingProducts = data
+            .map((value, index) =>
+              value ? mapFirebaseProduct(String(index), value as FirebaseProduct) : null
+            )
+            .filter(Boolean) as Product[];
+        } else {
+          existingProducts = Object.entries(
+            data as Record<string, FirebaseProduct | null | undefined>
+          )
+            .map(([key, value]) =>
+              value ? mapFirebaseProduct(key, value) : null
+            )
+            .filter(Boolean) as Product[];
+        }
+      }
+
+      const nomerIndukBarang =
+        product.nomer_induk_barang ||
+        generateNomerIndukBarang(product, existingProducts) ||
+        "";
+
+      const payload = productToFirebasePayload({
+        ...product,
+        nomer_induk_barang: nomerIndukBarang,
+      });
+
+      await push(productsRef, payload);
       router.push("/");
     } catch (err) {
       console.error("Failed to add product", err);

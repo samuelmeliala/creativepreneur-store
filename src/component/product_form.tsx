@@ -442,6 +442,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               onChange={handleChange}
               min="0"
               required
+              disabled={isFieldDisabled("stok_barang")}
               className={getInputClass("stok_barang")}
               placeholder="0"
             />
