@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import ProductListContent from "../../component/productlist-content";
 import Sidebar from "../../component/sidebar";
@@ -13,21 +13,14 @@ export default function ProductListPage() {
   const router = useRouter();
   const role = (session?.user as any)?.role as Role | undefined;
   const isAdmin = role === "admin";
+  const isMahasiswa = role === "mahasiswa";
 
-  const actionSlot = (
-    <div className="flex items-center gap-2">
-      {status === "authenticated" ? (
-        <Button
-          variant="outline"
-          onClick={() => signOut({ callbackUrl: "/productlist" })}
-        >
-          Logout
-        </Button>
-      ) : (
-        <Button onClick={() => router.push("/login")}>Login</Button>
-      )}
-    </div>
-  );
+  const actionSlot =
+    status === "unauthenticated" ? (
+      <div className="flex items-center gap-2">
+        <Button onClick={() => router.push("/login")}>Login to add/edit products</Button>
+      </div>
+    ) : null;
 
   const content = (
     <ProductListContent
@@ -38,7 +31,7 @@ export default function ProductListPage() {
     />
   );
 
-  if (isAdmin) {
+  if (isAdmin || isMahasiswa) {
     return (
       <div className="min-h-screen bg-[#DBE2EF] flex flex-col md:flex-row">
         <Sidebar />

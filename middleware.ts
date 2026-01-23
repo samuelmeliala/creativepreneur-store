@@ -3,6 +3,7 @@ import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
 const PUBLIC_PATHS = ["/", "/productlist"];
+const MAHASISWA_ALLOWED = ["/productlist", "/newproduct", "/"];
 
 export default withAuth(
   function middleware(req) {
@@ -13,10 +14,9 @@ export default withAuth(
       return NextResponse.next();
     }
 
-    // mahasiswa can ONLY access the public product list
     if (role === "mahasiswa") {
-      const allowed = PUBLIC_PATHS.some(
-        (path) => pathname === path || pathname.startsWith(`${path}/`)
+      const allowed = MAHASISWA_ALLOWED.some((path) =>
+        pathname === path || pathname.startsWith(`${path}/`)
       );
       if (!allowed) {
         return NextResponse.redirect(new URL("/productlist", req.url));

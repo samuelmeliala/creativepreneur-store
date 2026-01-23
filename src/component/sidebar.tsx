@@ -9,6 +9,7 @@ import {
   PackageSearch,
   PlusSquare,
   Printer,
+  LogOut,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -26,9 +27,8 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"] },
-  { label: "Product List", href: "/productlist", icon: PackageSearch, roles: ["admin"] },
-  // 👉 mahasiswa can ONLY see this one
-  { label: "Add Product", href: "/newproduct", icon: PlusSquare, roles: ["admin"] },
+  { label: "Product List", href: "/productlist", icon: PackageSearch, roles: ["admin", "mahasiswa"] },
+  { label: "Add Product", href: "/newproduct", icon: PlusSquare, roles: ["admin", "mahasiswa"] },
   { label: "Product Cards", href: "/print", icon: Printer, roles: ["admin"] },
 ];
 
@@ -148,18 +148,26 @@ export default function Sidebar() {
 
           {/* Mobile footer: user + logout */}
           {session?.user && (
-            <div className="mt-4 border-t pt-4 text-xs text-gray-500 space-y-2">
-              <p>
-                Logged in as{" "}
-                <span className="font-semibold">{session.user.name}</span> ({role})
-              </p>
+            <div
+              className={`mt-4 border-t pt-4 text-xs text-gray-500 space-y-2 ${
+                isCollapsed ? "flex flex-col items-center" : ""
+              }`}
+            >
+              {!isCollapsed && (
+                <p className="text-center">
+                  Logged in as{" "}
+                  <span className="font-semibold">{session.user.name}</span> ({role})
+                </p>
+              )}
               <Button
                 variant="outline"
-                // size="sm"
-                className="w-full justify-center"
+                aria-label="Logout"
+                className={`w-full justify-center ${
+                  isCollapsed ? "h-10 w-10 rounded-full p-0" : ""
+                }`}
                 onClick={() => signOut({ callbackUrl: "/login" })}
               >
-                Logout
+                {isCollapsed ? <LogOut className="h-4 w-4" /> : "Logout"}
               </Button>
             </div>
           )}
@@ -201,22 +209,28 @@ export default function Sidebar() {
 
           {/* Desktop footer: user + logout */}
           {session?.user && (
-            <div className="mt-4 border-t pt-4 text-xs text-gray-500 space-y-2">
-              <p>
-                Logged in as{" "}
-                <span className="font-semibold">{session.user.name}</span> ({role})
-              </p>
+            <div
+              className={`mt-4 border-t pt-4 text-xs text-gray-500 space-y-2 ${isCollapsed ? "flex flex-col items-center" : ""}`}
+            >
+              {!isCollapsed && (
+                <p className="text-center">
+                  Logged in as{" "}
+                  <span className="font-semibold">{session.user.name}</span> ({role})
+                </p>
+              )}
               <Button
                 variant="outline"
-                // size="sm"
-                className="w-full justify-center"
-                onClick={() => signOut({ callbackUrl: "/login" })}
+                aria-label="Logout"
+                className={`w-full justify-center ${isCollapsed ? "h-10 w-10 rounded-full p-0" : ""}`}
+                onClick={() => signOut({ callbackUrl: "/productlist" })}
               >
-                Logout
+                {isCollapsed ? <LogOut className="h-4 w-4" /> : "Logout"}
               </Button>
             </div>
           )}
-          <div className="mt-6 text-center text-xs text-gray-500">
+          <div
+            className={`mt-6 text-center text-xs text-gray-500 ${isCollapsed ? "hidden" : "block"}`}
+          >
             Creativepreneurship Department Binus Bandung © 2025
 
           </div>
@@ -225,3 +239,4 @@ export default function Sidebar() {
     </>
   );
 }
+
