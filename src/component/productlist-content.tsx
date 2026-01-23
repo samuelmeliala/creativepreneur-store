@@ -1,18 +1,30 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
-import { ref, onValue } from "firebase/database";
-import { db } from "../../../lib/firebase";
-import SearchInput from "../../../component/search";
+import React, { useEffect, useMemo, useState } from "react";
+import { onValue, ref } from "firebase/database";
+import { db } from "../lib/firebase";
+import SearchInput from "./search";
 import {
-  Product,
   FirebaseProduct,
-  mapFirebaseProduct,
+  Product,
   ProductSortKey,
-} from "../../../lib/data";
-import ProductTable from "../../../component/product_table";
+  mapFirebaseProduct,
+} from "../lib/data";
+import ProductTable from "./product_table";
 
-export default function ProductListPage() {
+type ProductListContentProps = {
+  canEdit?: boolean;
+  title?: string;
+  subtitle?: string;
+  actionSlot?: React.ReactNode;
+};
+
+export default function ProductListContent({
+  canEdit = false,
+  title = "Product List",
+  subtitle = "Browse and manage products.",
+  actionSlot,
+}: ProductListContentProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortKey, setSortKey] = useState<ProductSortKey>("nama_produk");
@@ -97,41 +109,43 @@ export default function ProductListPage() {
   }, [products, searchTerm, sortKey, sortOrder]);
 
   return (
-    <div className="min-h-screen bg-[#DBE2EF] font-sans p-4 sm:p-6 lg:p-8">
-      <div className="max-w-full mx-auto">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-[#112D4E]">Product List</h1>
-          <p className="text-sm text-[#112D4E] mt-1">Browse and manage products.</p>
-        </header>
+    <div className="max-w-full mx-auto">
+      <header className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-[#112D4E]">{title}</h1>
+          <p className="text-sm text-[#112D4E] mt-1">{subtitle}</p>
+        </div>
+        {actionSlot}
+      </header>
 
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="w-full sm:flex-1 sm:max-w-3xl">
-              <SearchInput
-                value={searchTerm}
-                onChange={setSearchTerm}
-                onClear={() => setSearchTerm("")}
-              />
-            </div>
+      <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="w-full sm:flex-1 sm:max-w-3xl">
+            <SearchInput
+              value={searchTerm}
+              onChange={setSearchTerm}
+              onClear={() => setSearchTerm("")}
+            />
           </div>
         </div>
-
-        <ProductTable
-          products={filteredAndSortedProducts}
-          sortKey={sortKey}
-          sortOrder={sortOrder}
-          onSort={handleSort}
-        />
-
-        <footer className="text-center mt-8 text-gray-500 text-sm">
-          <p>
-            Showing {filteredAndSortedProducts.length} of {products.length} products.
-          </p>
-          <div className="mt-2 text-xs text-gray-500">
-            Creativepreneurship Department Binus Bandung © 2025
-          </div>
-        </footer>
       </div>
+
+      <ProductTable
+        products={filteredAndSortedProducts}
+        sortKey={sortKey}
+        sortOrder={sortOrder}
+        onSort={handleSort}
+        canEdit={canEdit}
+      />
+
+      <footer className="text-center mt-8 text-gray-500 text-sm">
+        <p>
+          Showing {filteredAndSortedProducts.length} of {products.length} products.
+        </p>
+        <div className="mt-2 text-xs text-gray-500">
+          Creativepreneurship Department Binus Bandung Ac 2025
+        </div>
+      </footer>
     </div>
   );
 }

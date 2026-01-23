@@ -9,6 +9,7 @@ type ProductTableProps = {
   sortKey: ProductSortKey;
   sortOrder: "asc" | "desc";
   onSort: (key: ProductSortKey) => void;
+  canEdit?: boolean;
 };
 
 type GroupedProduct = {
@@ -37,7 +38,13 @@ function getDriveImageUrl(url?: string): string | undefined {
 }
 
 
-const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrder, onSort }) => {
+const ProductTable: React.FC<ProductTableProps> = ({
+  products,
+  sortKey,
+  sortOrder,
+  onSort,
+  canEdit = true,
+}) => {
   const [selectedGroup, setSelectedGroup] = useState<GroupedProduct | null>(null);
   const router = useRouter();
 
@@ -152,9 +159,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, sortKey, sortOrde
                       <Button variant="table" onClick={() => setSelectedGroup(group)}>
                         Details
                       </Button>
-                      <Button variant="table" onClick={() => router.push(`/edit/${primary.id}`)}>
-                        Edit
-                      </Button>
+                      {canEdit && (
+                        <Button variant="table" onClick={() => router.push(`/edit/${primary.id}`)}>
+                          Edit
+                        </Button>
+                      )}
                     </div>
                   </td>
                 </tr>

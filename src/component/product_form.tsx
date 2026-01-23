@@ -131,7 +131,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // NEW: handle the file input separately (uncontrolled).
+  // Handle the file input separately (uncontrolled).
   const handleFile = (event: React.ChangeEvent<HTMLInputElement>) => {
     const f = event.target.files?.[0] ?? null;
     setFile(f);

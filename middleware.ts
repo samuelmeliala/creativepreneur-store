@@ -2,16 +2,24 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
+const PUBLIC_PATHS = ["/", "/productlist"];
+
 export default withAuth(
   function middleware(req) {
     const { pathname } = req.nextUrl;
     const role = req.nextauth.token?.role as "admin" | "mahasiswa" | undefined;
 
-    // mahasiswa can ONLY access /newproduct (and "/" for role-based redirect landing)
+    if (!role) {
+      return NextResponse.next();
+    }
+
+    // mahasiswa can ONLY access the public product list
     if (role === "mahasiswa") {
-      const allowed = pathname === "/" || pathname.startsWith("/newproduct");
+      const allowed = PUBLIC_PATHS.some(
+        (path) => pathname === path || pathname.startsWith(`${path}/`)
+      );
       if (!allowed) {
-        return NextResponse.redirect(new URL("/newproduct", req.url));
+        return NextResponse.redirect(new URL("/productlist", req.url));
       }
     }
 
@@ -19,7 +27,14 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
+      authorized: ({ req, token }) => {
+        const { pathname } = req.nextUrl;
+        const isPublic = PUBLIC_PATHS.some(
+          (path) => pathname === path || pathname.startsWith(`${path}/`)
+        );
+        if (isPublic) return true;
+        return !!token;
+      },
     },
   }
 );

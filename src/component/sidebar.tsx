@@ -28,7 +28,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, roles: ["admin"] },
   { label: "Product List", href: "/productlist", icon: PackageSearch, roles: ["admin"] },
   // 👉 mahasiswa can ONLY see this one
-  { label: "Add Product", href: "/newproduct", icon: PlusSquare, roles: ["admin", "mahasiswa"] },
+  { label: "Add Product", href: "/newproduct", icon: PlusSquare, roles: ["admin"] },
   { label: "Product Cards", href: "/print", icon: Printer, roles: ["admin"] },
 ];
 
