@@ -32,7 +32,7 @@ export default function ProductListPage() {
   const content = (
     <ProductListContent
       canEdit={isAdmin}
-      title="Product List"
+      title="Creativepreneur Store Product List"
       subtitle={isAdmin ? "Browse and manage products." : "Browse available products."}
       actionSlot={isAdmin ? undefined : actionSlot}
     />

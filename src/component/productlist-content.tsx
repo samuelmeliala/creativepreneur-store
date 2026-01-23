@@ -21,7 +21,7 @@ type ProductListContentProps = {
 
 export default function ProductListContent({
   canEdit = false,
-  title = "Product List",
+  title = "Creativepreneur Store Product List",
   subtitle = "Browse and manage products.",
   actionSlot,
 }: ProductListContentProps) {
@@ -122,9 +122,9 @@ export default function ProductListContent({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="w-full sm:flex-1 sm:max-w-3xl">
             <SearchInput
-              value={searchTerm}
-              onChange={setSearchTerm}
-              onClear={() => setSearchTerm("")}
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              clearSearch={() => setSearchTerm("")}
             />
           </div>
         </div>
