@@ -13,5 +13,5 @@ export default async function HomePage() {
     redirect("/productlist");
   }
   
-  redirect("/login");
+  redirect("/productlist");
 }
