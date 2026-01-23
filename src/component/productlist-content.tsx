@@ -143,7 +143,7 @@ export default function ProductListContent({
           Showing {filteredAndSortedProducts.length} of {products.length} products.
         </p>
         <div className="mt-2 text-xs text-gray-500">
-          Creativepreneurship Department Binus Bandung Ac 2025
+          Creativepreneurship Department Binus Bandung © 2025
         </div>
       </footer>
     </div>
