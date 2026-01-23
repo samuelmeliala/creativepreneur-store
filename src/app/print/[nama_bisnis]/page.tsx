@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ref, onValue } from "firebase/database";
-import { db } from "../../../../lib/firebase";
-import { Product } from "../../../../lib/data";
+import { db } from "../../../lib/firebase";
+import { Product } from "../../../lib/data";
 
 export default function PrintByNamaBisnisPage() {
   const params = useParams();
