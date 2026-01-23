@@ -61,22 +61,8 @@ export default function PrintByNamaBisnisPage() {
     return <div className="p-8 text-center text-gray-500">Product not found.</div>;
   }
 
-  // Handler for clicking outside the details
-  const handleOutsideClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      router.push('/print');
-    }
-  };
-
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-[#DBE2EF] min-h-screen" onClick={handleOutsideClick}>
-      {/* Fixed Back Button */}
-      <button
-        className="fixed top-6 left-6 px-5 py-2 bg-[#ffffff] text-black font-semibold rounded-lg hover:bg-[#8f8f8f] transition-colors shadow-lg z-50"
-        onClick={() => router.push('/print')}
-      >
-       Back
-      </button>
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-[#DBE2EF] min-h-screen">
       <div className="max-w-2xl w-full mx-auto mt-12 p-8 bg-white rounded-2xl shadow-lg border border-blue-200 relative" onClick={e => e.stopPropagation()}>
         <h1 className="text-4xl font-extrabold text-[#112D4E] mb-2 tracking-tight">{product.nama_bisnis}</h1>
         <div className="mb-2 text-[#3F72AF] font-semibold text-xl">{product.kategori_bisnis}</div>
@@ -110,12 +96,12 @@ export default function PrintByNamaBisnisPage() {
             </tbody>
           </table>
         </div>
-      </div>
-    <footer className="text-center mt-8 text-gray-500 text-sm">
+      <footer className="text-center mt-8 text-gray-500 text-sm">
       <div className="mt-2 text-xs text-gray-500">
         Creativepreneurship Department Binus Bandung © 2025
       </div>
-    </footer>
+      </footer>
+      </div>
     </div>
   );
 }
