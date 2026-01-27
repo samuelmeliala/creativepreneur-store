@@ -1,7 +1,7 @@
 import * as React from "react";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "outline" | "table";
+  variant?: "primary" | "secondary" | "outline" | "table" | "delete";
 };
 
 export const Button: React.FC<ButtonProps> = ({
@@ -26,6 +26,10 @@ export const Button: React.FC<ButtonProps> = ({
       break;
     case "table":
       styles = "px-2 py-1 text-sm border border-gray-300 text-gray-700 hover:bg-gray-100";
+      break;
+    case "delete":
+      styles = "bg-red-600 hover:bg-red-700 text-white";
+      break;
   }
 
   return (

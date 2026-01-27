@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ref, get, update } from "firebase/database";
+import { ref, get, update, remove } from "firebase/database";
 import ProductForm, { ProductFormData } from "../../../../component/product_form";
 import { Button } from "../../../../component/ui/button";
 import {
@@ -31,8 +31,10 @@ const EditProductPage: React.FC = () => {
   const [initialData, setInitialData] = useState<ProductFormData | null>(null);
   const [groupKey, setGroupKey] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (!productId) {
@@ -120,6 +122,24 @@ const EditProductPage: React.FC = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!productId || isDeleting) return;
+    setIsDeleting(true);
+    setError(null);
+
+    try {
+      const productRef = ref(db, `${PRODUCTS_PATH}${productId}`);
+      await remove(productRef);
+      router.push("/productlist?deleted=1");
+    } catch (err) {
+      console.error("Failed to delete product", err);
+      setError("Failed to delete product. Please try again.");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-[#DBE2EF] font-sans p-4 sm:p-6 lg:p-8">
       <div className="mx-auto max-w-full space-y-6">
@@ -128,9 +148,25 @@ const EditProductPage: React.FC = () => {
             <h1 className="text-3xl font-bold text-[#112D4E]">Edit Product</h1>
             <p className="text-sm text-[#112D4E] mt-1">Update the fields below to modify the product.</p>
           </div>
-          <Button type="button" variant="secondary" onClick={() => router.push("/")}>
-            Back to Dashboard
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="delete"
+              className="border-red-200 text-red-700 hover:bg-red-50"
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={isSubmitting || isDeleting || isLoading || !!error || !initialData}
+            >
+              {isDeleting ? "Deleting..." : "Delete Product"}
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() => router.push("/productlist")}
+              disabled={isSubmitting || isDeleting}
+            >
+              Back to Product List
+            </Button>
+          </div>
         </div>
 
         {isLoading && (
@@ -155,6 +191,37 @@ const EditProductPage: React.FC = () => {
           />
         )}
       </div>
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+          <div className="w-full max-w-md rounded-xl bg-white shadow-xl p-6 space-y-4">
+            <div>
+              <h2 className="text-xl font-semibold text-[#112D4E]">Delete product?</h2>
+              <p className="mt-1 text-sm text-gray-600">
+                This action cannot be undone. The product will be permanently removed from the database.
+              </p>
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                className="bg-red-600 hover:bg-red-700 text-white"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };
