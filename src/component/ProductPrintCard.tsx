@@ -13,7 +13,7 @@ interface ProductPrintCardProps {
 // Standard business card size: 3.5 x 2 inches (about 336 x 192 px at 96dpi)
 const ProductPrintCard: React.FC<ProductPrintCardProps> = ({ product, team }) => {
   const [qrSrc, setQrSrc] = useState<string | null>(null);
-  const qrUrl = `${QR_DOMAIN}/print/${normalizeNamaBisnis(product.nama_bisnis)}`;
+  const qrUrl = `${QR_DOMAIN}/cards/${normalizeNamaBisnis(product.nama_bisnis)}`;
 
   React.useEffect(() => {
     let mounted = true;
