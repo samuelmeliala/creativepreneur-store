@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProductListContent from "../../component/productlist-content";
@@ -9,7 +9,7 @@ import { Button } from "../../component/ui/button";
 
 type Role = "admin" | "mahasiswa";
 
-export default function ProductListPage() {
+function ProductListPageContent() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -90,5 +90,13 @@ export default function ProductListPage() {
       </div>
       {successPopup}
     </>
+  );
+}
+
+export default function ProductListPage() {
+  return (
+    <Suspense fallback={<div className="p-4 text-[#112D4E]">Loading products…</div>}>
+      <ProductListPageContent />
+    </Suspense>
   );
 }
