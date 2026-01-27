@@ -58,7 +58,7 @@ const AddProductPage: React.FC = () => {
       });
 
       await push(productsRef, payload);
-      router.push("/");
+      router.push("/productlist?added=1");
     } catch (err) {
       console.error("Failed to add product", err);
       setError("Failed to add product. Please try again.");
@@ -85,7 +85,7 @@ const AddProductPage: React.FC = () => {
         <ProductForm
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
-          submitLabel="Add Product"
+          submitLabel="Submit Product"
           onCancel={() => router.push("/")}
           lokasiEditable={false}
           stokEditable={false}
