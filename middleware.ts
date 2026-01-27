@@ -2,7 +2,8 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
 
-const PUBLIC_PATHS = ["/", "/productlist", "/cards/[[...nama_bisnis]]"];
+// Public pages that do not require authentication (e.g., QR landing pages)
+const PUBLIC_PATHS = ["/", "/productlist", "/cards"];
 const MAHASISWA_ALLOWED = ["/productlist", "/newproduct", "/"];
 
 export default withAuth(
