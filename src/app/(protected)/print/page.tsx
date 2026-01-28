@@ -17,6 +17,7 @@ const categoryList: Categories[] = [
   "Perdagangan",
   "Craft / Kriya",
   "Sports",
+  "Cosmetics & Household",
   "Others",
 ];
 const toString = (value: unknown): string => (typeof value === "string" ? value : "");
