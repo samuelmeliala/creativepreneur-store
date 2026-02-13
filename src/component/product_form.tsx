@@ -61,6 +61,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   }, [initialData]);
 
   const [formData, setFormData] = useState<ProductFormData>(resolvedInitial);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   // NEW: hold selected file + preview (not in your payload)
   const [file, setFile] = useState<File | null>(null);
@@ -92,8 +93,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   const isFieldRequired = (field: keyof ProductFormData) => {
-    // All fields are required except lokasi_barang and stok_barang
-    return field !== "lokasi_barang" && field !== "stok_barang";
+    // All fields are required except lokasi_barang
+    return field !== "lokasi_barang";
   };
 
   const renderLabel = (label: string, field: keyof ProductFormData) => {
@@ -149,29 +150,29 @@ const ProductForm: React.FC<ProductFormProps> = ({
     };
   }, [preview]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleConfirmSubmit = async () => {
     // If a new file is picked, upload it and set foto_produk to the URL
     let payload: ProductFormData = { ...formData };
 
     if (file && !isFieldDisabled("foto_produk")) {
       if (!file.type.startsWith("image/")) {
         alert("File harus berupa gambar.");
+        setShowConfirmation(false);
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
         alert("Ukuran gambar harus < 5MB.");
+        setShowConfirmation(false);
         return;
       }
 
       // Upload -> get URL
       const { imageUrl } = await saveProductWithCloudinary(file, {
-      name: formData.nama_produk || "Produk",
-      price: Number(String(formData.harga_produk).replace(/[^\d]/g, "") || 0),
-      category: String(formData.kategori_bisnis),
-      description: formData.nama_bisnis || "",
-    });
+        name: formData.nama_produk || "Produk",
+        price: Number(String(formData.harga_produk).replace(/[^\d]/g, "") || 0),
+        category: String(formData.kategori_bisnis),
+        description: formData.nama_bisnis || "",
+      });
 
       payload = { ...payload, foto_produk: imageUrl };
     }
@@ -179,16 +180,20 @@ const ProductForm: React.FC<ProductFormProps> = ({
     // Submit the final payload (with uploaded image URL when applicable)
     await onSubmit(payload);
 
-    // Cleanup blob preview and file state after successful submit
-    if (preview && preview.startsWith("blob:")) {
-      try {
-        URL.revokeObjectURL(preview);
-      } catch (_) {
-        /* ignore */
-      }
+    setShowConfirmation(false);
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+
+    // The browser will check 'required' fields and report validity.
+    if (form.checkValidity()) {
+      setShowConfirmation(true);
+    } else {
+      // This will trigger the browser's own validation UI.
+      form.reportValidity();
     }
-    setFile(null);
-    setPreview("");
   };
 
   const resetForm = () => {
@@ -215,9 +220,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               className={getInputClass("nama")}
               placeholder="John Doe"
             />
-            {isFieldDisabled("nama") && (
-              <p className="mt-1 text-xs text-gray-500">Data mahasiswa tidak dapat diubah dari halaman ini.</p>
-            )}
           </div>
 
           <div>
@@ -474,6 +476,30 @@ const ProductForm: React.FC<ProductFormProps> = ({
           {isSubmitting ? "Saving..." : submitLabel}
         </Button>
       </div>
+
+      {showConfirmation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Confirm Product Submission</h2>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to submit this product? Please ensure all information is correct.
+            </p>
+            <div className="flex justify-end gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowConfirmation(false)}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button type="button" onClick={handleConfirmSubmit} disabled={isSubmitting}>
+                {isSubmitting ? "Submitting..." : "Yes, Submit"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 };
