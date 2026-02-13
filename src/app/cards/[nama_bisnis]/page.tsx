@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ref, onValue } from "firebase/database";
 import { db } from "../../../lib/firebase";
 import { Product } from "../../../lib/data";
+import Image from "next/image";
 
 export default function PrintByNamaBisnisPage() {
   const params = useParams();
@@ -62,18 +63,39 @@ export default function PrintByNamaBisnisPage() {
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-[#DBE2EF] min-h-screen">
-      <div className="max-w-2xl w-full mx-auto mt-12 p-8 bg-white rounded-2xl shadow-lg border border-blue-200 relative" onClick={e => e.stopPropagation()}>
-        <h1 className="text-4xl font-extrabold text-[#112D4E] mb-2 tracking-tight">{product.nama_bisnis}</h1>
-        <div className="mb-2 text-[#3F72AF] font-semibold text-xl">{product.kategori_bisnis}</div>
-        <div className="mb-6 text-2xl text-[#22223B] font-bold">{product.nama_produk}</div>
-        <div className="space-y-1 text-lg">
-          <div><span className="font-bold text-[#112D4E]">Nomer Induk Barang:</span> <span className="text-[#22223B]">{product.nomer_induk_barang}</span></div>
-          <div><span className="font-bold text-[#112D4E]">Tanggal Berdiri:</span> <span className="text-[#22223B]">{product.tanggal_berdiri}</span></div>
-          <div><span className="font-bold text-[#112D4E]">Lokasi Barang:</span> <span className="text-[#22223B]">{product.lokasi_barang}</span></div>
-          <div><span className="font-bold text-[#112D4E]">Stok Barang:</span> <span className="text-[#22223B]">{product.stok_barang}</span></div>
-          <div><span className="font-bold text-[#112D4E]">Harga Produk:</span> <span className="text-[#22223B]">{product.harga_produk}</span></div>
-          <div><span className="font-bold text-[#112D4E]">Tanggal Diserahkan:</span> <span className="text-[#22223B]">{product.tanggal_diserahkan}</span></div>
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-[#DBE2EF] min-h-screen overflow-y-auto py-8">
+      <div className="max-w-4xl w-full mx-auto p-8 bg-white rounded-2xl shadow-lg border border-blue-200 relative" onClick={e => e.stopPropagation()}>
+        {/* Header section with text on left and image on right */}
+        <div className="flex flex-col md:flex-row gap-6 mb-6">
+          {/* Left side - Text content */}
+          <div className="flex-1">
+            <h1 className="text-4xl font-extrabold text-[#112D4E] mb-2 tracking-tight">{product.nama_bisnis}</h1>
+            <div className="mb-2 text-[#3F72AF] font-semibold text-xl">{product.kategori_bisnis}</div>
+            <div className="mb-6 text-2xl text-[#22223B] font-bold">{product.nama_produk}</div>
+            <div className="space-y-1 text-lg">
+              <div><span className="font-bold text-[#112D4E]">Nomer Induk Barang:</span> <span className="text-[#22223B]">{product.nomer_induk_barang}</span></div>
+              <div><span className="font-bold text-[#112D4E]">Tanggal Berdiri:</span> <span className="text-[#22223B]">{product.tanggal_berdiri}</span></div>
+              <div><span className="font-bold text-[#112D4E]">Lokasi Barang:</span> <span className="text-[#22223B]">{product.lokasi_barang}</span></div>
+              <div><span className="font-bold text-[#112D4E]">Stok Barang:</span> <span className="text-[#22223B]">{product.stok_barang}</span></div>
+              <div><span className="font-bold text-[#112D4E]">Harga Produk:</span> <span className="text-[#22223B]">{product.harga_produk}</span></div>
+              <div><span className="font-bold text-[#112D4E]">Tanggal Diserahkan:</span> <span className="text-[#22223B]">{product.tanggal_diserahkan}</span></div>
+            </div>
+          </div>
+          /* Product Image */
+          {product.foto_produk && (
+            <div className="flex-shrink-0 w-full md:w-72">
+              <div className="relative w-full h-64 md:h-72 rounded-xl overflow-hidden border border-gray-200 shadow-md">
+                <Image
+                  src={product.foto_produk}
+                  alt={product.nama_produk || "Product Image"}
+                  fill
+                  className="object-contain bg-gray-50"
+                  sizes="(max-width: 768px) 100vw, 288px"
+                  unoptimized
+                />
+              </div>
+            </div>
+          )}
         </div>
         <h2 className="mt-10 mb-3 text-2xl font-bold text-[#3F72AF]">Anggota Terkait Produk Ini</h2>
         <div className="overflow-x-auto rounded-lg border border-gray-200 bg-gray-50">
