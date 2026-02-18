@@ -85,19 +85,18 @@ const ProductPrintCard: React.FC<ProductPrintCardProps> = ({ product, team }) =>
       onClick={() => window.location.href = qrUrl}
       role="button"
       tabIndex={0}
-      // Removed interactive props to disable pop out/bigger card on click
     >
       <div className="w-full flex flex-row justify-between items-start">
         <div className="flex-1 min-w-0 flex flex-col justify-between">
           <div>
-            <div className={`font-bold text-sm mb-1 text-blue-900 truncate w-full`} title={product.nama_bisnis}>
-              {product.nama_bisnis}
+            <div className={`font-bold text-sm mb-1 text-blue-900 truncate w-full`} title={product.nama_produk}>
+              {product.nama_produk}
             </div>
             <div className={`text-[11px] text-gray-700 mb-1 font-semibold`}>
               {product.kategori_bisnis}
             </div>
             <div className={`text-xs text-gray-900 font-medium break-words`}>
-              {product.nama_produk}
+              {product.nama_bisnis}
             </div>
           </div>
         </div>
